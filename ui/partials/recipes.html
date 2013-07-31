@@ -1,0 +1,18 @@
+<div class="panel panel-success col-7">
+    <h3 class="panel-heading">Rezepte</h3>
+    Search: <input ng-model="query">
+    <ul>
+    <li ng-repeat="recipe in recipes | filter:query | orderBy:orderBy">
+        <a href="#/recipes/{{recipe._id}}">{{recipe.title}}</a>
+    </li>
+    </ul>
+</div>
+<hr>
+<div class="panel panel-success col-7">
+    <h5 class="panel-heading">Aus CK</h5>
+    <form ng-submit="getFromCK()">
+        <input type="text" ng-model="ckId"  size="30"
+               placeholder="CK ID">
+        <input class="btn btn-primary" type="submit" value="Get it!">
+    </form>
+</div>
