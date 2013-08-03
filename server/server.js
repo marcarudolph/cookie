@@ -4,15 +4,42 @@ var express = require('express'),
     ck = require('./ck'),
     app = express();    
 
-    mongo.createClient(config.databases.recipes, function (err, recipesDb) {         
-        if (err) {
-            console.error("Opening the recipes db failed with error " + err);
-            return;
-        }        
-        app.databases = {recipes: recipesDb};
-    });
+mongo.createClient(config.databases.recipes, function(err, recipesDb) {
+    if (err) {
+        console.error("Opening the recipes db failed with error " + err);
+        return;
+    }
+    app.databases = {
+        recipes: recipesDb
+    };
+});
+    
+    
+    
+function dontCache(req, resp, next) {
+    resp.setHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+    next();
+}
 
-app.get('/api/upgradeAllRecipes', function(req, resp) {
+function dontCacheIfNoOtherPolicyPresent(req, resp, next) {
+    if(!resp.getHeader('Cache-Control')) 
+        resp.setHeader('Cache-Control', 'no-cache, no-store, max-age=0');
+    next();
+}
+
+function doCache(req, resp, next) {
+    resp.setHeader('Cache-Control', 'public, max-age=120');
+    next();
+}    
+
+var baseStatic = express.static(__dirname + '/../ui/');
+function cachingStatic(req, resp, next) {
+    doCache(req, resp, function() {
+        baseStatic(req, resp, next);
+    });
+}
+
+app.get('/api/upgradeAllRecipes', dontCache, function(req, resp) {
        app.databases.recipes.find().toArray(function(err, docs) {
             docs.map(function(recipe){
                 var changed = false;
@@ -41,7 +68,7 @@ app.get('/api/upgradeAllRecipes', function(req, resp) {
        resp.send("upgrade running");
 });
 
-app.get('/api/fetchCK/:id', function(req, resp) {
+app.get('/api/fetchCK/:id', dontCache, function(req, resp) {
     
     ck.getRecipe(req.params.id, function(err, recipe) {
         if (err) {
@@ -60,7 +87,7 @@ app.get('/api/fetchCK/:id', function(req, resp) {
     
 });
 
-app.get('/api/recipes/', function(req, resp) {
+app.get('/api/recipes/', dontCache, function(req, resp) {
     
     app.databases.recipes.find(null, {title: true}).toArray(function(err, recipes) {
         if (!err) 
@@ -71,7 +98,7 @@ app.get('/api/recipes/', function(req, resp) {
 });
 
 
-app.get('/api/recipes/:id', function(req, resp) {
+app.get('/api/recipes/:id', dontCache, function(req, resp) {
     
     app.databases.recipes.findOne({_id: req.params.id}, function(err, doc) {
         if (doc)
@@ -82,7 +109,7 @@ app.get('/api/recipes/:id', function(req, resp) {
     
 });
 
-app.use(express.static(__dirname + '/../ui/'));
+app.use(cachingStatic);
 
 app.listen(config.server.port);
 console.log('Listening on port ' + config.server.port);
