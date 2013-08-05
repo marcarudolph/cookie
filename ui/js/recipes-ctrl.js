@@ -1,6 +1,8 @@
 'use strict';
 
-function RecipesCtrl($scope) {
+function RecipesCtrl($scope, Page) {
+
+    Page.setTitle('Deine Rezepte');
 
     $.getJSON('/api/recipes/').done(function (data) {
         $scope.$apply(function () {
@@ -21,4 +23,4 @@ function RecipesCtrl($scope) {
     };
 }
 
-//RecipesCtrl.$inject = ['$scope'];
+//RecipesCtrl.$inject = ['$scope', Page];

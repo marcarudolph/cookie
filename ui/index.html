@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="cookie">
+<html lang="en" ng-app="cookie" ng-controller="PageCtrl">
 <head>
-    <title>Cookie</title>
+    <title>{{ Page.title() }} - Cookie</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
@@ -9,9 +9,10 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.js"></script>
-    <script src="js/app.js"></script>
     <script src="js/recipes-ctrl.js"></script>
     <script src="js/recipe-ctrl.js"></script>
+    <script src="js/auth-ctrl.js"></script>
+    <script src="js/app.js"></script>
     <style>
         .ng-dirty.ng-invalid { border:1px solid Red; }
     </style>
@@ -25,6 +26,9 @@
       <ul class="nav navbar-nav">
         <li class="active"><a href="#/">Home</a></li>
       </ul>
+      
+        <p class="navbar-text pull-right" ng-hide="!Page.authUser()">Signed in as <a href="#/auth" class="navbar-link">{{Page.authUser().name }}</a></p>
+      <p class="navbar-text pull-right" ng-hide="Page.authUser()"><a href="#/auth" class="navbar-link">Sign in</a></p>
     </div>
     <div class="container" ng-view></div>
 

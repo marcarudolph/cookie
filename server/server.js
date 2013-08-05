@@ -2,7 +2,14 @@ var express = require('express'),
     config = require('../config/cookie-config.js'),
     mongo = require('./mongo'),
     ck = require('./ck'),
+    passport = require('passport'),
+    GoogleStrategy = require('passport-google').Strategy,
     app = express();    
+
+
+app.use(express.cookieParser());
+app.use(express.session({ secret: 'keyboard cat' }));
+
 
 mongo.createClient(config.databases.recipes, function(err, recipesDb) {
     if (err) {
@@ -38,6 +45,61 @@ function cachingStatic(req, resp, next) {
         baseStatic(req, resp, next);
     });
 }
+
+
+//Auth
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(obj, done) {
+  done(null, obj);
+});
+
+passport.use(new GoogleStrategy({
+    returnURL: 'http://maiden.eztwo.com:' + config.server.port + '/auth/google/return',
+    realm: 'http://maiden.eztwo.com:'  + config.server.port
+  },
+  function(identifier, profile, done) {
+      profile.identifier = identifier;
+      return done(null, profile);
+  }
+));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.get('/auth/google', 
+  passport.authenticate('google', { failureRedirect: '/#/signin' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+
+app.get('/auth/google/return', 
+  passport.authenticate('google', { failureRedirect: '/#/signin' }),
+  function(req, res) {
+    res.redirect('/');
+  });
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
+});
+
+
+
+app.get('/api/init', dontCache, function(req, resp) {
+    
+    var appData = {};
+    if (req.user) {
+        appData.user = {
+            name: req.user.displayName,
+            id: req.user.emails[0]
+        };
+    }
+    
+    resp.send(appData);
+});
 
 app.get('/api/upgradeAllRecipes', dontCache, function(req, resp) {
        app.databases.recipes.find().toArray(function(err, docs) {
@@ -110,6 +172,7 @@ app.get('/api/recipes/:id', dontCache, function(req, resp) {
 });
 
 app.use(cachingStatic);
+
 
 app.listen(config.server.port);
 console.log('Listening on port ' + config.server.port);

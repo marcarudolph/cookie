@@ -1,9 +1,13 @@
 'use strict';
 
-function RecipeCtrl($scope, $routeParams) {
+function RecipeCtrl($scope, $routeParams, Page) {
 
     var url = './api/recipes/' + $routeParams.recipeId;
+    
+    Page.setTitle('Lade Rezept...');
+    
     $.getJSON(url).done(function (recipe) {
+        Page.setTitle(recipe.title);
         $scope.$apply(function () {
             recipe.ingredients.map(function (ing) {
                 ing.done = false;
@@ -13,6 +17,7 @@ function RecipeCtrl($scope, $routeParams) {
             $scope.recipe = recipe;
         });
     }).fail(function(a, b, c) {
+        Page.setTitle('Ooops...');
         console.error(a);
     });
 
@@ -32,4 +37,4 @@ function RecipeCtrl($scope, $routeParams) {
     });
 }
 
-//RecipeCtrl.$inject = ['$scope', $routeParams];
+//RecipeCtrl.$inject = ['$scope', $routeParams, Page];

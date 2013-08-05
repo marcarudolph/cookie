@@ -7,6 +7,8 @@
         "express": "*",
         "async": "*",
         "mongodb": "*",
-        "atob": "*"
+        "atob": "*",
+        "passport": "*",
+        "passport-google": "*"
     }
 }
