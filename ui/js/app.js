@@ -40,6 +40,7 @@ app.factory('Page', function() {
         },
         setAuthUser: function(user) {
             authUser = user;
+            localStorage.authType = user.authType;
         }
 
     };
@@ -48,8 +49,9 @@ app.factory('Page', function() {
 function PageCtrl($scope, Page) {
     
     $.getJSON('/api/init').done(function (appData) {
-        if (!appData.user)
+        if (!appData.user) {
             window.location.href="/#/auth";
+        }
         else
             Page.setAuthUser(appData.user)
     });

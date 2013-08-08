@@ -62,6 +62,7 @@ passport.use(new GoogleStrategy({
   },
   function(identifier, profile, done) {
       profile.identifier = identifier;
+      profile.authType = "google";
       return done(null, profile);
   }
 ));
@@ -94,7 +95,8 @@ app.get('/api/init', dontCache, function(req, resp) {
     if (req.user) {
         appData.user = {
             name: req.user.displayName,
-            id: req.user.emails[0]
+            id: req.user.emails[0],
+            authType: req.user.authType
         };
     }
     
