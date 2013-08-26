@@ -57,8 +57,8 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use(new GoogleStrategy({
-    returnURL: 'http://maiden.eztwo.com:' + config.server.port + '/auth/google/return',
-    realm: 'http://maiden.eztwo.com:'  + config.server.port
+    returnURL: config.server.baseurl + '/auth/google/return',
+    realm: config.server.baseurl
   },
   function(identifier, profile, done) {
       profile.identifier = identifier;
@@ -173,5 +173,5 @@ app.get('/api/recipes/:id', dontCache, function(req, resp) {
 app.use(cachingStatic);
 
 
-app.listen(config.server.port);
+app.listen(config.server.port, config.server.ip);
 console.log('Listening on port ' + config.server.port);
