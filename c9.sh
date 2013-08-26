@@ -5,4 +5,4 @@ SCRIPT=$(readlink -f $0)
 BASEDIR=$(dirname $SCRIPT)
 ABSBASEDIR=$(readlink -f $BASEDIR)
 
-nohup /var/www/cloud9/bin/cloud9.sh -l 0.0.0.0 -p 1506 -w $ABSBASEDIR > /tmp/c9.log 2>&1 &
+forever start /var/www/cloud9/server.js -w $ABSBASEDIR -l 0.0.0.0 -p $COOKIE_C9_PORT -a x-www-browser
