@@ -113,10 +113,7 @@ app.get('/api/upgradeAllRecipes', dontCache, function(req, resp) {
                     changed = true;
                     recipe.ingredients = recipe.ingedients;
                     delete recipe.ingedients;
-                }
-                
-                
-                
+                }                            
                 
                 if (changed) {
                    app.databases.recipes.save(recipe, function(err) {

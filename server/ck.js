@@ -54,8 +54,8 @@ function convertRecipe(url, ckResult, next) {
         "servings": parseInt(ckr.rezept_portionen),
         "ingredients": ckr.rezept_zutaten.map(function(z) {
             return {
-                "name": z.name,
-                "comment": z.eigenschaft,
+                "name": markdownifyHtml(z.name),
+                "comment": markdownifyHtml(z.eigenschaft),
                 "quantity": parseFloat(z.menge),
                 "unit": z.einheit
             };
@@ -107,9 +107,16 @@ function getNameFromFrontendUrl(url) {
 function splitInstructions(zubereitung) {
     var instructions = [];
     zubereitung.split('\r\n').map(function(z) {
-        if (z !== '') instructions.push(z);
+        if (z !== '') instructions.push(markdownifyHtml(z));
     });
     return instructions;
+}
+
+function markdownifyHtml(html) {
+    html = html.replace('<b>', '**').replace('</b>', '**');
+    html = html.replace('<i>', ' _').replace('</i>', '_ ');
+    
+    return html;
 }
 
 module.exports = ck;

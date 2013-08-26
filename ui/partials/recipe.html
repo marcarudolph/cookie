@@ -8,7 +8,7 @@
         <h3 class="panel-heading">Zubereitung</h3>
 
         <div ng-repeat="line in recipe.instructions track by $index">
-            <p class="lead">{{line}}</p>
+            <p class="lead" markdown="line"></p>
         </div>
     </div>
     <div class="panel panel-success col-offset-1 col-4">
@@ -19,9 +19,9 @@
                 <span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
                 <span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
                 <span ng-if="ing.unit">{{ing.unit}}</span>
-                <span>{{ing.name}}</span>
+                <span markdown="ing.name"></span>
                 <span ng-if="ing.comment">{{ing.comment}}</span>
-                <span class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
+                <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
             </li>
         </ul>
     </div>
