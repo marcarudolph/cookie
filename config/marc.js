@@ -1,7 +1,7 @@
 
 var config = {
     server: {
-        port:   1507
+        port:   1507,
         ip: "0.0.0.0",
         baseurl: 'http://maiden.eztwo.com:1507' 
     },
