@@ -9,6 +9,7 @@ var express = require('express'),
 
 app.use(express.cookieParser());
 app.use(express.session({ secret: 'keyboard cat' }));
+app.use(express.bodyParser());
 
 
 mongo.createClient(config.databases.recipes, function(err, recipesDb) {
@@ -162,6 +163,20 @@ app.get('/api/recipes/', dontCache, function(req, resp) {
 app.get('/api/recipes/:id', dontCache, function(req, resp) {
     
     app.databases.recipes.findOne({_id: req.params.id}, function(err, doc) {
+        if (doc)
+            resp.send(doc);
+        else
+            resp.send(404);
+    });
+});
+
+
+app.put('/api/recipes/:id', dontCache, function(req, resp) {
+    
+    var recipe = req.body;
+    recipe["_id"] = req.params.id;
+    
+    app.databases.recipes.save(recipe, function(err, doc) {
         if (doc)
             resp.send(doc);
         else
