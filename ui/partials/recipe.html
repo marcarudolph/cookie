@@ -1,6 +1,19 @@
-<div class="page-header">
-    <h1>{{recipe.title}}</h1>
+<div ng-hide="edit" class="page-header">
+    <h1>
+        <span ng-hide="edit" class="glyphicon glyphicon-pencil" ng-click="beginEdit()"/>
+        {{recipe.title}}
+    </h1>
     <h4>{{recipe.subtitle}}</h4>
+</div>
+
+<div ng-hide="!edit" class="page-header">
+    <h1>
+        <span class="glyphicon glyphicon-ok" ng-click="saveRecipe();" />
+        <input type="text" ng-model="recipe.title" placeholder="Titel eingeben"/>
+    </h1>
+    <h4>
+        <input type="text" ng-model="recipe.subtitle" placeholder="Untertitel eingeben"/>
+    </h4>
 </div>
 
 <div class="row">
@@ -15,13 +28,21 @@
         <h3 class="panel-heading">Zutaten f&uuml;r
             <input style="width: 25px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/^([1-9][0-9]*)$/" /></h3>
         <ul class="list-group">
-            <li class="list-group-item" ng-click="ing.done = !ing.done" ng-repeat="ing in recipe.ingredients" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
-                <span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
-                <span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
-                <span ng-if="ing.unit">{{ing.unit}}</span>
-                <span markdown="ing.name"></span>
-                <span ng-if="ing.comment">{{ing.comment}}</span>
-                <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
+            <li class="list-group-item" ng-repeat="ing in recipe.ingredients" >
+                <article ng-hide="edit" ng-click="ing.done = !ing.done" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
+                    <span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
+                    <span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
+                    <span ng-if="ing.unit">{{ing.unit}}</span>
+                    <span markdown="ing.name"></span>
+                    <span ng-if="ing.comment">{{ing.comment}}</span>
+                    <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
+                </article>
+                <article ng-hide="!edit">
+                    <input type="text" ng-model="ing.quantity_calc" style="width: 50px"/>
+                    <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="false"/>
+                    <input type="text" ng-model="ing.name"/>
+                    <input type="text" ng-model="ing.comment"/>    
+                </article>
             </li>
         </ul>
     </div>
