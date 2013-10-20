@@ -58,6 +58,18 @@ function RecipeCtrl($scope, $routeParams, Page) {
         $scope.edit = false;
     };
     
+    $scope.addIngredientToRecipe = function (){
+       $scope.recipe.ingredients.push(
+            {
+              "name": "",
+              "comment": "",
+              "quantity": 0,
+              "quantity_calc": 0,
+              "unit": false,
+              "done": false
+            });
+    };
+    
     function renameAndSaveRecipe(recipe){
         $.ajax({
               type: "POST",
@@ -74,6 +86,8 @@ function RecipeCtrl($scope, $routeParams, Page) {
     }
     
     function saveRecipeToServer(recipe){
+        recalculateIngredientQuantities();
+        
         $.ajax({
             type: "PUT",
             url: './api/recipes/' + recipe._id,
@@ -82,6 +96,12 @@ function RecipeCtrl($scope, $routeParams, Page) {
             data: angular.toJson(recipe)
         }).done(function(){
             window.location.href = "/#/recipes/" +  recipe._id;
+        });
+    }
+    
+    function recalculateIngredientQuantities(){
+         $scope.recipe.ingredients.map(function (ing) {
+            ing.quantity = Math.round(ing.quantity_calc / $scope.recipe.servings * $scope.recipe.original_servings * 100) / 100;
         });
     }
 }

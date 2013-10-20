@@ -26,7 +26,8 @@
     </div>
     <div class="panel panel-success col-offset-1 col-4">
         <h3 class="panel-heading">Zutaten f&uuml;r
-            <input style="width: 25px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/^([1-9][0-9]*)$/" /></h3>
+            <input style="width: 25px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/^([1-9][0-9]*)$/" />
+        </h3>
         <ul class="list-group">
             <li class="list-group-item" ng-repeat="ing in recipe.ingredients" >
                 <article ng-hide="edit" ng-click="ing.done = !ing.done" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
@@ -45,7 +46,6 @@
                 </article>
             </li>
         </ul>
+        <div class="glyphicon glyphicon-plus" ng-hide="!edit" ng-click="addIngredientToRecipe();"  />
     </div>
-
-
 </div>
