@@ -1,6 +1,9 @@
 <div ng-hide="edit" class="page-header">
+
     <h1>
         <span ng-hide="edit" class="glyphicon glyphicon-pencil" ng-click="beginEdit()"/>
+    </h1>
+    <h1>
         {{recipe.title}}
     </h1>
     <h4>{{recipe.subtitle}}</h4>
@@ -9,6 +12,9 @@
 <div ng-hide="!edit" class="page-header">
     <h1>
         <span class="glyphicon glyphicon-ok" ng-click="saveRecipe();" />
+        <span class="glyphicon glyphicon-remove" ng-click="cancelEdit();" />
+    </h1>
+    <h1>
         <input type="text" ng-model="recipe.title" placeholder="Titel eingeben"/>
     </h1>
     <h4>

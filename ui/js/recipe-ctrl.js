@@ -40,7 +40,13 @@ function RecipeCtrl($scope, $routeParams, Page) {
     });
     
     $scope.beginEdit = function () {
+        $scope.recipeBackup = JSON.parse(JSON.stringify($scope.recipe));
         $scope.edit = true;    
+    };
+    
+    $scope.cancelEdit = function () {
+        $scope.recipe = $scope.recipeBackup;
+        $scope.edit = false;    
     };
 
     
