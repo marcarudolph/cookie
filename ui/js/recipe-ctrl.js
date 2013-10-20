@@ -70,6 +70,13 @@ function RecipeCtrl($scope, $routeParams, Page) {
             });
     };
     
+    $scope.deleteIngredient = function (ingredient) {
+        var index = $scope.recipe.ingredients.indexOf(ingredient);
+        if (index > -1) {
+            $scope.recipe.ingredients.splice(index, 1);
+        };
+    };
+    
     function renameAndSaveRecipe(recipe){
         $.ajax({
               type: "POST",
