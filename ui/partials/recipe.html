@@ -1,7 +1,6 @@
-<div ng-hide="edit" class="page-header">
-
+<div ng-if="!edit" class="page-header">
     <h1>
-        <span ng-hide="edit" class="glyphicon glyphicon-pencil" ng-click="beginEdit()"/>
+        <span class="glyphicon glyphicon-pencil" ng-click="beginEdit()"/>
     </h1>
     <h1>
         {{recipe.title}}
@@ -9,7 +8,7 @@
     <h4>{{recipe.subtitle}}</h4>
 </div>
 
-<div ng-hide="!edit" class="page-header">
+<div ng-if="edit" class="page-header">
     <h1>
         <span class="glyphicon glyphicon-ok" ng-click="saveRecipe();" />
         <span class="glyphicon glyphicon-remove" ng-click="cancelEdit();" />
@@ -28,9 +27,9 @@
 
         <ol>
             <li ng-repeat="line in recipe.instructions track by $index">
-                <p class="lead" markdown="recipe.instructions[$index]" ng-hide="edit"></p>
-                <div ng-hide="!edit">
-                    <textarea name="textarea" style="width:100%;" ng-model="recipe.instructions[$index]"></textarea>
+                <p class="lead" markdown="recipe.instructions[$index]" ng-if="!edit"></p>
+                <div ng-if="edit">
+                    <textarea style="width:100%;" ng-model="recipe.instructions[$index]" placeholder="Zubereitungsschritt beschreiben"></textarea>
                     <div class="glyphicon glyphicon-remove" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
                 </div>
             </li>
@@ -43,7 +42,7 @@
         </h3>
         <ul class="list-group">
             <li class="list-group-item" ng-repeat="ing in recipe.ingredients" >
-                <article ng-hide="edit" ng-click="ing.done = !ing.done" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
+                <article ng-if="!edit" ng-click="ing.done = !ing.done" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
                     <span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
                     <span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
                     <span ng-if="ing.unit">{{ing.unit}}</span>
@@ -51,7 +50,7 @@
                     <span ng-if="ing.comment">{{ing.comment}}</span>
                     <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
                 </article>
-                <article ng-hide="!edit">
+                <article ng-if="edit">
                     <input type="text" ng-model="ing.quantity_calc" style="width: 50px"/>
                     <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="Einh."/>
                     <input type="text" ng-model="ing.name" placeholder="Name"/>
@@ -60,6 +59,6 @@
                 </article>
             </li>
         </ul>
-        <div class="glyphicon glyphicon-plus" ng-hide="!edit" ng-click="addIngredientToRecipe();"  />
+        <div class="glyphicon glyphicon-plus" ng-if="edit" ng-click="addIngredientToRecipe();"  />
     </div>
 </div>
