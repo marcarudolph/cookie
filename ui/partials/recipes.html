@@ -2,10 +2,11 @@
     <h3 class="panel-heading">Rezepte</h3>
     Search: <input ng-model="query">
     <ul>
-    <li ng-repeat="recipe in recipes | filter:query | orderBy:orderBy">
-        <a href="#/recipes/{{recipe._id}}">{{recipe.title}}</a>
-    </li>
+        <li ng-repeat="recipe in recipes | filter:query | orderBy:orderBy">
+            <a href="#/recipes/{{recipe._id}}">{{recipe.title}}</a>
+        </li>
     </ul>
+    <a class="glyphicon glyphicon-plus" href="#/recipes/"></a>
 </div>
 <hr>
 <div class="panel panel-success col-7">

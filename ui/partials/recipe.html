@@ -26,9 +26,16 @@
     <div class="panel panel-success col-7">
         <h3 class="panel-heading">Zubereitung</h3>
 
-        <div ng-repeat="line in recipe.instructions track by $index">
-            <p class="lead" markdown="line"></p>
-        </div>
+        <ol>
+            <li ng-repeat="line in recipe.instructions track by $index">
+                <p class="lead" markdown="recipe.instructions[$index]" ng-hide="edit"></p>
+                <div ng-hide="!edit">
+                    <textarea name="textarea" style="width:100%;" ng-model="recipe.instructions[$index]"></textarea>
+                    <div class="glyphicon glyphicon-remove" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
+                </div>
+            </li>
+        </ol>
+        <div class="glyphicon glyphicon-plus" ng-hide="!edit" ng-click="addInstructionToRecipe();"  />
     </div>
     <div class="panel panel-success col-offset-1 col-4">
         <h3 class="panel-heading">Zutaten f&uuml;r
@@ -46,10 +53,10 @@
                 </article>
                 <article ng-hide="!edit">
                     <input type="text" ng-model="ing.quantity_calc" style="width: 50px"/>
-                    <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="false"/>
-                    <input type="text" ng-model="ing.name"/>
-                    <input type="text" ng-model="ing.comment"/>    
-                    <span class="glyphicon glyphicon-remove" ng-click="deleteIngredient(ing);" />
+                    <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="Einh."/>
+                    <input type="text" ng-model="ing.name" placeholder="Name"/>
+                    <input type="text" ng-model="ing.comment" placeholder="Kommentar"/>    
+                    <div class="glyphicon glyphicon-remove" ng-click="deleteIngredient(ing);"></div>
                 </article>
             </li>
         </ul>

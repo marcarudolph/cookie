@@ -170,7 +170,6 @@ app.get('/api/recipes/:id', dontCache, function(req, resp) {
     });
 });
 
-
 app.put('/api/recipes/:id', dontCache, function(req, resp) {
     
     var recipe = req.body;
@@ -185,40 +184,63 @@ app.put('/api/recipes/:id', dontCache, function(req, resp) {
     
 });
 
+function handleRenameRecipe(req, resp) {
+    var renameData = req.body;
+    
+    app.databases.recipes.findOne({_id: renameData.oldId}, function(err, recipe) {
+    
+    if (recipe){
+        recipe._id = getIdFromRecipeTitle(renameData.title);
+
+        if(renameData.oldId !== recipe._id){
+            console.log(recipe);
+            app.databases.recipes.insert(recipe, function(err){
+                if(!err){
+                    app.databases.recipes.remove({_id: renameData.oldId}, function(err){
+                        if(!err){
+                            resp.send({id: recipe._id});
+                        }
+                        else {
+                            resp.send(406);
+                        }
+                    });
+                }
+                else {
+                    resp.send(405);
+                }
+            });
+        }
+    }
+    else
+        resp.send(404);
+        
+    });    
+}
+
+function handleNewRecipe(req, resp) {
+    var recipe = req.body;
+    recipe._id = getIdFromRecipeTitle(recipe.title);
+    
+    app.databases.recipes.insert(recipe, function(err){
+        if(!err){
+            resp.send({id: recipe._id});
+        }
+        else {
+            resp.send(405);
+        }
+    });
+    
+}
 
 app.post('/api/recipes/', dontCache, function(req, resp) {
     
-    if (req.query.action === "rename") {
-        var renameData = req.body;
-        
-        app.databases.recipes.findOne({_id: renameData.oldId}, function(err, recipe) {
-        
-        if (recipe){
-            recipe._id = getIdFromRecipeTitle(renameData.title);
-    
-            if(renameData.oldId !== recipe._id){
-                console.log(recipe);
-                app.databases.recipes.insert(recipe, function(err){
-                    if(!err){
-                        app.databases.recipes.remove({_id: renameData.oldId}, function(err){
-                            if(!err){
-                                resp.send({id: recipe._id});
-                            }
-                            else {
-                                resp.send(406);
-                            }
-                        });
-                    }
-                    else {
-                        resp.send(405);
-                    }
-                });
-            }
-        }
-        else
-            resp.send(404);
-            
-        });
+    switch (req.query.action) {
+        case "rename":
+            handleRenameRecipe(req, resp);
+            break;
+        case "new":
+            handleNewRecipe(req, resp);
+            break;
     }
 });
 
