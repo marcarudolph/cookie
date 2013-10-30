@@ -1,11 +1,25 @@
-var http = require('http'),
+var https = require('https'),
     atob = require('atob');
 
 var ck = {
 
     getRecipe: function(id, next) {
-        var url = atob('aHR0cDovL2FwaS5jaGVma29jaC5kZS9hcGkvMS4yL2FwaS1yZWNpcGUucGhwP0lEPQ==') + id;
-        http.get(url, function(res) {
+        var host = atob('YXBpLmNoZWZrb2NoLmRl'),
+            path = atob('L2FwaS8xLjIvYXBpLXJlY2lwZS5waHA/SUQ9') + id,
+            agent = atob('TW96aWxsYS81LjAgKGlQaG9uZTsgQ1BVIGlQaG9uZSBPUyA2XzFfMyBsaWtlIE1hYyBPUyBYKSBBcHBsZVdlYktpdC81MzYuMjYgKEtIVE1MLCBsaWtlIEdlY2tvKSBNb2JpbGUvMTBCMzI5ICg1MDM2NTU1MzYp'),
+            url = 'https://' + host + path;
+
+        var options = { 
+            hostname: host,
+            path: path,
+            method: 'GET',
+            headers: { 
+                'X-Requested-With': 'XMLHttpRequest',
+                'User-Agent': agent
+            }
+        };       
+        
+        https.get(options, function(res) {
             var json = '';
             res.on('data', function(chunk) {
                 json += chunk;
@@ -66,15 +80,20 @@ function convertRecipe(url, ckResult, next) {
         "nutrition": {
             "kcal": ckr.rezept_kcal
         },
-        "pictures": ckr.rezept_bilder.map(function(b) {
+        "tags": ckr.rezept_tags
+    };
+    
+    if (ckr.rezept_bilder) {
+        recipe.pictures = ckr.rezept_bilder.map(function(b) {
             var format = getBiggestPictureFormat(b);
             return {
                 "file": format.file,
                 "user_name": format.user_name
             };
-        }),
-        "tags": ckr.rezept_tags
-    };
+        });
+    } else {
+        recipe.pictures = [];
+    }
 
     next(null, recipe);
 }

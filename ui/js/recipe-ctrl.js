@@ -2,32 +2,91 @@
 
 function RecipeCtrl($scope, $routeParams, Page) {
 
-    var url = './api/recipes/' + $routeParams.recipeId;
-    
-    Page.setTitle('Lade Rezept...');
-    
-    $.getJSON(url).done(function (recipe) {
-        Page.setTitle(recipe.title);
-        $scope.$apply(function () {
-            recipe.ingredients.map(function (ing) {
-                ing.done = false;
-                ing.quantity_calc = ing.quantity;
-            });
-            recipe.original_servings = recipe.servings;
-            $scope.recipe = recipe;
-        });
-    }).fail(function(a, b, c) {
-        Page.setTitle('Ooops...');
-        console.error(a);
-    });
-
+    var id = $routeParams.recipeId;
     $scope.recipe = {};
+
+    function createNewRecipe() {
+        var recipe = {
+            origin: {
+                system: 'cookie'
+            },
+          rating: {
+            likes: 0
+          },
+          instructions: [],
+          servings: 2,
+          ingredients: [],
+          pictures: [],
+          tags: []
+        };
+        $scope.recipe = recipe;
+        $scope.original_id = null;
+        $scope.beginEdit();
+        
+        Page.setTitle('Neues Rezept...');
+    }
+
+    function loadRecipe(id) {
+        var url = './api/recipes/' + id;
+        
+        Page.setTitle('Lade Rezept...');
+        
+        $.getJSON(url).done(function (recipe) {
+            Page.setTitle(recipe.title);
+            $scope.$apply(function () {
+                recipe.ingredients.map(function (ing) {
+                    ing.done = false;
+                    ing.quantity_calc = ing.quantity;
+                });
+                recipe.original_servings = recipe.servings;
+                
+                $scope.recipe = recipe;
+                $scope.original_id = recipe._id;
+                $scope.edit = false;
+            });
+        }).fail(function() {
+            Page.setTitle('Ooops...');
+        });        
+    }
+
 
     $scope.addToShoppingList = function (ingredient) {
         console.log(ingredient.name);
     };
 
-    $scope.$watch('recipe.servings', function (newValue, oldValue) {
+    $scope.addInstructionToRecipe = function (){
+        $scope.recipe.instructions.push("");
+    };
+    
+    $scope.deleteInstruction = function (instruction){
+        var index = $scope.recipe.instructions.indexOf(instruction);
+        if (index > -1) {
+            $scope.recipe.instructions.splice(index, 1);
+        }        
+    };
+
+
+    $scope.addIngredientToRecipe = function (){
+       $scope.recipe.ingredients.push(
+            {
+              "name": "",
+              "comment": "",
+              "quantity": 1,
+              "quantity_calc": 1,
+              "unit": null,
+              "done": false
+            });
+    };
+    
+    $scope.deleteIngredient = function (ingredient) {
+        var index = $scope.recipe.ingredients.indexOf(ingredient);
+        if (index > -1) {
+            $scope.recipe.ingredients.splice(index, 1);
+        }
+    };
+
+
+    $scope.$watch('recipe.servings', function (newValue) {
         if (!newValue || !$scope.recipe.servings)
             return;
 
@@ -35,6 +94,90 @@ function RecipeCtrl($scope, $routeParams, Page) {
             ing.quantity_calc = Math.round(ing.quantity / $scope.recipe.original_servings * newValue * 100) / 100;
         });
     });
+    
+    $scope.beginEdit = function () {
+        $scope.recipeBackup = JSON.parse(JSON.stringify($scope.recipe));
+        $scope.edit = true;    
+    };
+    
+    $scope.cancelEdit = function () {
+        $scope.recipe = $scope.recipeBackup;
+        $scope.edit = false;    
+    };
+
+    
+    $scope.saveRecipe = function () {
+        if (!$scope.recipe._id) {
+            $scope.saveNewRecipeToServer();
+        }
+        else if($scope.original_id !== $scope.recipe._id)
+        {
+            renameAndSaveRecipeToServer($scope.recipe);
+        }
+        else
+        {
+            saveRecipeToServer($scope.recipe);
+        }
+            
+        $scope.edit = false;
+    };
+    
+    $scope.saveNewRecipeToServer = function() {
+        $scope.recipe.original_servings = $scope.recipe.servings;
+        recalculateIngredientQuantities();
+        
+        $.ajax({
+            type: "POST",
+            url: './api/recipes/?action=new',
+            dataType: "json",
+            contentType : 'application/json',
+            data: angular.toJson($scope.recipe)
+        }).done(function(response){
+            window.location.href = "/#/recipes/" +  response.id;
+        });        
+    };
+    
+    function renameAndSaveRecipeToServer(recipe){
+        $.ajax({
+              type: "POST",
+              url: "/api/recipes/?action=rename",
+              dataType: "json",
+              contentType : 'application/json',
+              data: angular.toJson({
+                  oldId: recipe._id, 
+                  title: recipe.title })
+            }).done(function( response ){
+                recipe._id = response.id; 
+                saveRecipeToServer(recipe);
+            });
+    }
+    
+    function saveRecipeToServer(recipe){
+        recalculateIngredientQuantities();
+        
+        $.ajax({
+            type: "PUT",
+            url: './api/recipes/' + recipe._id,
+            dataType: "json",
+            contentType : 'application/json',
+            data: angular.toJson(recipe)
+        }).done(function(){
+            window.location.href = "/#/recipes/" +  recipe._id;
+        });
+    }
+    
+    function recalculateIngredientQuantities(){
+         $scope.recipe.ingredients.map(function (ing) {
+            ing.quantity = Math.round(ing.quantity_calc / $scope.recipe.servings * $scope.recipe.original_servings * 100) / 100;
+        });
+    }
+
+    
+    if (id)
+        loadRecipe(id);
+    else
+        createNewRecipe();
+    
 }
 
 //RecipeCtrl.$inject = ['$scope', $routeParams, Page];

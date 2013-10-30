@@ -43,6 +43,11 @@ app.directive('markdown', function () {
 
             function updateContent() {
                 
+                if (!markdown) {
+                    element.html("");
+                    return;
+                }
+                
                 var safeMarkdown = safeTags(markdown);
                 
                 var htmlText = showdown.makeHtml(safeMarkdown);

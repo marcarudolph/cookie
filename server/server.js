@@ -170,19 +170,78 @@ app.get('/api/recipes/:id', dontCache, function(req, resp) {
     });
 });
 
-
 app.put('/api/recipes/:id', dontCache, function(req, resp) {
     
     var recipe = req.body;
     recipe["_id"] = req.params.id;
     
-    app.databases.recipes.save(recipe, function(err, doc) {
-        if (doc)
-            resp.send(doc);
+    app.databases.recipes.save(recipe, function(err) {
+        if (!err)
+            resp.send(recipe);
         else
-            resp.send(404);
+            resp.send(404); //<- TODO.. httpstatuscodes, wikipedia
     });
     
+});
+
+function handleRenameRecipe(req, resp) {
+    var renameData = req.body;
+    
+    app.databases.recipes.findOne({_id: renameData.oldId}, function(err, recipe) {
+    
+    if (recipe){
+        recipe._id = getIdFromRecipeTitle(renameData.title);
+
+        if(renameData.oldId !== recipe._id){
+            console.log(recipe);
+            app.databases.recipes.insert(recipe, function(err){
+                if(!err){
+                    app.databases.recipes.remove({_id: renameData.oldId}, function(err){
+                        if(!err){
+                            resp.send({id: recipe._id});
+                        }
+                        else {
+                            resp.send(406);
+                        }
+                    });
+                }
+                else {
+                    resp.send(405);
+                }
+            });
+        }
+    }
+    else
+        resp.send(404);
+        
+    });    
+}
+
+function handleNewRecipe(req, resp) {
+    var recipe = req.body;
+    recipe._id = getIdFromRecipeTitle(recipe.title);
+    
+    app.databases.recipes.insert(recipe, function(err){
+        if(!err){
+            resp.send({id: recipe._id});
+        }
+        else {
+            resp.send(405);
+        }
+    });
+    
+}
+
+app.post('/api/recipes/', dontCache, function(req, resp) {
+    
+    switch (req.query.action) {
+        case "rename":
+            handleRenameRecipe(req, resp);
+            break;
+        case "new":
+            handleNewRecipe(req, resp);
+            break;
+    }
 });
 
 app.use(cachingStatic);
@@ -190,3 +249,34 @@ app.use(cachingStatic);
 
 app.listen(config.server.port, config.server.ip);
 console.log('Listening on port ' + config.server.port);
+
+function getIdFromRecipeTitle(title){
+    var tmp = title.toLowerCase();
+    
+    tmp = tmp.replace(" ","-");
+    tmp = tmp.replace("/","-");
+    tmp = tmp.replace("?","-");
+
+    tmp = tmp.replace("ä","ae");
+    tmp = tmp.replace("ö","oe");
+    tmp = tmp.replace("ü","ue");
+    tmp = tmp.replace("ß","ss");
+    
+    return tmp;
+}
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
