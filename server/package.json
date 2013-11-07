@@ -9,6 +9,7 @@
         "mongodb": "*",
         "atob": "*",
         "passport": "*",
-        "passport-google": "*"
+        "passport-google": "*",
+        "connect-flash": "*"
     }
 }

@@ -13,6 +13,10 @@ config(['$routeProvider', function($routeProvider) {
         templateUrl: 'partials/auth.html',
         controller: AuthCtrl
     }).
+    when('/error', {
+        templateUrl: 'partials/error.html',
+        controller: ErrorCtrl
+    }).
     when('/recipes/:recipeId', {
         templateUrl: 'partials/recipe.html',
         controller: RecipeCtrl
@@ -87,18 +91,22 @@ app.factory('Page', function() {
             authUser = user;
             localStorage.authType = user.authType;
         }
-
     };
 });
 
 function PageCtrl($scope, Page) {
     
     $.getJSON('/api/init').done(function (appData) {
-        if (!appData.user) {
+        if (appData.errors && appData.errors.length > 0) {
+            app.errors = appData.errors;
+            window.location.href="/#/error";
+        }
+        else if (!appData.user) {
             window.location.href="/#/auth";
         }
-        else
+        else {
             Page.setAuthUser(appData.user)
+        }
     });
     
     

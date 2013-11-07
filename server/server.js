@@ -1,6 +1,7 @@
 var express = require('express'),
     config = require('../config/cookie-config.js'),
     mongo = require('./mongo'),
+    flash = require('connect-flash'),
     ck = require('./ck'),
     passport = require('passport'),
     GoogleStrategy = require('passport-google').Strategy,
@@ -8,20 +9,25 @@ var express = require('express'),
 
 
 app.use(express.cookieParser());
-app.use(express.session({ secret: 'keyboard cat' }));
+app.use(express.session({ secret: config.session.secret }));
+app.use(flash());
 app.use(express.bodyParser());
 
+function openDatabase(dbName, done) {
+    mongo.createClient(config.databases[dbName], function(err, collection) {
+        if (err) {
+            console.error("Opening the " + dbName + " collection failed with error " + err);
+            done(err);
+            return;
+        }
+        app.databases = app.databases || {};
+        app.databases[dbName] = collection;
+        done(null, collection);
+    });
+}
 
-mongo.createClient(config.databases.recipes, function(err, recipesDb) {
-    if (err) {
-        console.error("Opening the recipes db failed with error " + err);
-        return;
-    }
-    app.databases = {
-        recipes: recipesDb
-    };
-});
-    
+openDatabase("recipes", function(){});
+openDatabase("users", function(){});    
     
     
 function dontCache(req, resp, next) {
@@ -58,27 +64,35 @@ passport.deserializeUser(function(obj, done) {
 });
 
 passport.use(new GoogleStrategy({
-    returnURL: config.server.baseurl + '/auth/google/return',
-    realm: config.server.baseurl
-  },
-  function(identifier, profile, done) {
-      profile.identifier = identifier;
-      profile.authType = "google";
-      return done(null, profile);
-  }
+        returnURL: config.server.baseurl + '/auth/google/return',
+        realm: config.server.baseurl
+    },
+    function(identifier, profile, done) {
+      
+        app.databases.users.findOne({_id: identifier}, function(err, doc) {
+            if (doc) {
+                profile.identifier = identifier;
+                profile.authType = "google";
+                return done(null, profile);
+            }
+            else {
+                return done(null, false, { message: "No user with identifier " + identifier + " found"});
+            }
+        });
+    }
 ));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/auth/google', 
-  passport.authenticate('google', { failureRedirect: '/#/signin' }),
+  passport.authenticate('google', { failureRedirect: '/#/signin', failureFlash: true }),
   function(req, res) {
     res.redirect('/');
   });
 
 app.get('/auth/google/return', 
-  passport.authenticate('google', { failureRedirect: '/#/signin' }),
+  passport.authenticate('google', { failureRedirect: '/#/', failureFlash: true }),
   function(req, res) {
     res.redirect('/');
   });
@@ -92,7 +106,10 @@ app.get('/logout', function(req, res){
 
 app.get('/api/init', dontCache, function(req, resp) {
     
-    var appData = {};
+    var appData = {
+        errors: req.flash('error')
+    };
+    
     if (req.user) {
         appData.user = {
             name: req.user.displayName,
