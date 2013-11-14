@@ -48,6 +48,18 @@ function RecipeCtrl($scope, $routeParams, Page) {
             Page.setTitle('Ooops...');
         });        
     }
+    
+    function insertNewElementOnLastElementTabKey(event, element, array, newHandler){
+        if (event.which !== 9
+            || event.altKey
+            || event.shiftKey
+            || event.ctrlKey)
+            return;
+        
+        if (array.indexOf(element) === array.length - 1) {
+            newHandler();
+        }
+    };
 
 
     $scope.addToShoppingList = function (ingredient) {
@@ -65,6 +77,9 @@ function RecipeCtrl($scope, $routeParams, Page) {
         }        
     };
 
+    $scope.handleInstructionTabKey = function(event, element) {
+        insertNewElementOnLastElementTabKey(event, element, $scope.recipe.instructions, $scope.addInstructionToRecipe);
+    }
 
     $scope.addIngredientToRecipe = function (){
        $scope.recipe.ingredients.push(
@@ -84,6 +99,10 @@ function RecipeCtrl($scope, $routeParams, Page) {
             $scope.recipe.ingredients.splice(index, 1);
         }
     };
+
+    $scope.handleIngredientTabKey = function(event, element) {
+        insertNewElementOnLastElementTabKey(event, element, $scope.recipe.ingredients, $scope.addIngredientToRecipe);
+    }
 
 
     $scope.$watch('recipe.servings', function (newValue) {

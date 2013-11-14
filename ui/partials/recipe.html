@@ -29,7 +29,7 @@
             <li ng-repeat="line in recipe.instructions track by $index">
                 <p class="lead" markdown="recipe.instructions[$index]" ng-if="!edit"></p>
                 <div ng-if="edit">
-                    <textarea style="width:100%;" ng-model="recipe.instructions[$index]" placeholder="Zubereitungsschritt beschreiben"></textarea>
+                    <textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
                     <div class="glyphicon glyphicon-remove" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
                 </div>
             </li>
@@ -51,10 +51,10 @@
                     <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
                 </article>
                 <article ng-if="edit">
-                    <input type="text" ng-model="ing.quantity_calc" style="width: 50px"</input>
-                    <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="Einh."</input>
-                    <input type="text" ng-model="ing.name" placeholder="Name"</input>
-                    <input type="text" ng-model="ing.comment" placeholder="Kommentar"</input>   
+                    <input type="text" ng-model="ing.quantity_calc" style="width: 50px"></input>
+                    <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="Einh."></input>
+                    <input type="text" ng-model="ing.name" placeholder="Name"></input>
+                    <input type="text" ng-model="ing.comment" placeholder="Kommentar" ng-keydown="handleIngredientTabKey($event, ing)"></input>   
                     <div class="glyphicon glyphicon-remove" ng-click="deleteIngredient(ing);"></div>
                 </article>
             </li>
