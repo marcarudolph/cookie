@@ -159,7 +159,7 @@ app.get('/api/fetchCK/:id', dontCache, function(req, resp) {
             if (!err)
                 resp.send({_id: recipe._id});    
             else
-                resp.send(500);
+                resp.send(409);
         });
         
     });
@@ -172,7 +172,7 @@ app.get('/api/recipes/', dontCache, function(req, resp) {
         if (!err) 
             resp.send(recipes);
         else
-            resp.send(500);
+            resp.send(404);
     });    
 });
 
@@ -196,7 +196,7 @@ app.put('/api/recipes/:id', dontCache, function(req, resp) {
         if (!err)
             resp.send(recipe);
         else
-            resp.send(404); //<- TODO.. httpstatuscodes, wikipedia
+            resp.send(409);
     });
     
 });
@@ -218,12 +218,12 @@ function handleRenameRecipe(req, resp) {
                             resp.send({id: recipe._id});
                         }
                         else {
-                            resp.send(406);
+                            resp.send(410);
                         }
                     });
                 }
                 else {
-                    resp.send(405);
+                    resp.send(409);
                 }
             });
         }
@@ -243,7 +243,7 @@ function handleNewRecipe(req, resp) {
             resp.send({id: recipe._id});
         }
         else {
-            resp.send(405);
+            resp.send(409);
         }
     });
     
