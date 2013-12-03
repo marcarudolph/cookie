@@ -38,7 +38,9 @@
     </div>
     <div class="panel panel-success col-offset-1 col-4">
         <h3 class="panel-heading">Zutaten f&uuml;r
-            <input style="width: 25px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/^([1-9][0-9]*)$/" </input>
+            <input style="width: 40px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/^([1-9][0-9]*)$/"> </input>
+            <span ng-if="edit">Berechnungsgrundlage:</span>
+            <input ng-if="edit" style="width: 40px" type="text" class="" ng-model="recipe.original_servings" required ng-pattern="/^([1-9][0-9]*)$/"></input>
         </h3>
         <ul class="list-group">
             <li class="list-group-item" ng-repeat="ing in recipe.ingredients" >

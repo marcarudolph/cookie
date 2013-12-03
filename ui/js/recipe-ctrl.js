@@ -142,7 +142,6 @@ function RecipeCtrl($scope, $routeParams, Page) {
     };
     
     $scope.saveNewRecipeToServer = function() {
-        $scope.recipe.original_servings = $scope.recipe.servings;
         recalculateIngredientQuantities();
         
         $.ajax({
@@ -172,6 +171,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
     }
     
     function saveRecipeToServer(recipe){
+        $scope.recipe.servings = $scope.recipe.original_servings;
         recalculateIngredientQuantities();
         
         $.ajax({
