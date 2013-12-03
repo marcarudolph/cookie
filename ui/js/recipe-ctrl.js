@@ -103,7 +103,16 @@ function RecipeCtrl($scope, $routeParams, Page) {
     $scope.handleIngredientTabKey = function(event, element) {
         insertNewElementOnLastElementTabKey(event, element, $scope.recipe.ingredients, $scope.addIngredientToRecipe);
     }
+    
+    $scope.addLikeToRecipe = function()
+    {
+        $scope.recipe.rating.likes = $scope.recipe.rating.likes +1;
+    }
 
+    $scope.removeLikeFromRecipe = function()
+    {
+        $scope.recipe.rating.likes = $scope.recipe.rating.likes -1;
+    }
 
     $scope.$watch('recipe.servings', function (newValue) {
         if (!newValue || !$scope.recipe.servings)
