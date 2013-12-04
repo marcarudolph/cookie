@@ -59,7 +59,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
         if (array.indexOf(element) === array.length - 1) {
             newHandler();
         }
-    };
+    }
 
 
     $scope.addToShoppingList = function (ingredient) {
@@ -79,7 +79,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
 
     $scope.handleInstructionTabKey = function(event, element) {
         insertNewElementOnLastElementTabKey(event, element, $scope.recipe.instructions, $scope.addInstructionToRecipe);
-    }
+    };
 
     $scope.addIngredientToRecipe = function (){
        $scope.recipe.ingredients.push(
@@ -102,17 +102,31 @@ function RecipeCtrl($scope, $routeParams, Page) {
 
     $scope.handleIngredientTabKey = function(event, element) {
         insertNewElementOnLastElementTabKey(event, element, $scope.recipe.ingredients, $scope.addIngredientToRecipe);
-    }
+    };
     
     $scope.addLikeToRecipe = function()
     {
-        $scope.recipe.rating.likes = $scope.recipe.rating.likes +1;
-    }
+        console.log("add");
+        console.log($scope.recipe._id);
+        $.ajax({
+            type: "POST",
+            url: "/api/recipes/" + $scope.recipe._id + "/likes?action=add",
+        }).done(function( response ){
+            console.log($scope.recipe._id);
+            window.location.reload();
+        });
+    };
 
     $scope.removeLikeFromRecipe = function()
     {
-        $scope.recipe.rating.likes = $scope.recipe.rating.likes -1;
-    }
+        console.log("remove");
+        $.ajax({
+            type: "POST",
+            url: "/api/recipes/" + $scope.recipe._id + "/likes?action=remove",
+        }).done(function( response ){
+            window.location.reload();
+        });
+    };
 
     $scope.$watch('recipe.servings', function (newValue) {
         if (!newValue || !$scope.recipe.servings)

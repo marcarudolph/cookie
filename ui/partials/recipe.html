@@ -8,8 +8,8 @@
     <h4>
         <div style="float:left">{{recipe.subtitle}}</div>
         <div style="float:right">
-            <span ng-if="recipe.rating.likes >= 0" title="{{recipe.rating.likes}}" class="glyphicon glyphicon-thumbs-up" ></span>
-            <span ng-if="recipe.rating.likes < 0" title="{{recipe.rating.likes}}" class="glyphicon glyphicon-thumbs-down" style="float:right"></span>
+            <span class="glyphicon glyphicon-thumbs-up" title="{{recipe.rating.likes}}" ng-click="addLikeToRecipe();"></span>
+            <span class="glyphicon glyphicon-thumbs-down" title="{{recipe.rating.likes}}" ng-click="removeLikeFromRecipe();"></span>
         </div>
         <div style="clear:both"></div>
     </h4>
@@ -24,14 +24,7 @@
         <input type="text" ng-model="recipe.title" placeholder="Titel eingeben"></input>
     </h1>
     <h4>
-        <div style="float:left">
-            <input type="text" ng-model="recipe.subtitle" placeholder="Untertitel eingeben"></input>
-        </div>
-        <div style="float:right">
-            <span class="glyphicon glyphicon-thumbs-up" title="{{recipe.rating.likes}}" ng-click="addLikeToRecipe();"></span>
-            <span class="glyphicon glyphicon-thumbs-down" title="{{recipe.rating.likes}}" ng-click="removeLikeFromRecipe();"></span>
-        </div>
-        <div style="clear:both"></div>
+        <input type="text" ng-model="recipe.subtitle" placeholder="Untertitel eingeben"></input>
     </h4>
 </div>
 

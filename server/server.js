@@ -281,6 +281,34 @@ function getIdFromRecipeTitle(title){
     
     return tmp;
 }
+
+app.post('/api/recipes/:id/likes', dontCache, function(req, resp) {
+    app.databases.recipes.findOne({_id:  req.params.id}, function(err, recipe) {
+        if (recipe){
+            
+            switch (req.query.action) {
+                case "add":
+                    recipe.rating.likes = recipe.rating.likes +1;
+                break;
+                case "remove":
+                    recipe.rating.likes = recipe.rating.likes -1;
+                break;
+            }
+            
+            app.databases.recipes.save(recipe, function(err){
+                if(!err){
+                    resp.send(205);
+                }
+                else {
+                    resp.send(409);
+                }
+            });
+        }
+        else{
+            resp.send(404);
+        }
+    });
+});
     
     
     
