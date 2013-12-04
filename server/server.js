@@ -297,7 +297,8 @@ app.post('/api/recipes/:id/likes', dontCache, function(req, resp) {
             
             app.databases.recipes.save(recipe, function(err){
                 if(!err){
-                    resp.send(JSON.stringify({}));
+                    resp.type('application/json');
+                    resp.send(200);
                 }
                 else {
                     resp.send(409);

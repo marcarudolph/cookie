@@ -131,8 +131,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
             contentType : 'application/json',
             data: angular.toJson({
                   "action": "dislike" })
-        }).done(function( response ){
-            console.log("done remove");
+        }).done(function(){
             window.location.reload();
         });
     };
