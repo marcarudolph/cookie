@@ -285,19 +285,19 @@ function getIdFromRecipeTitle(title){
 app.post('/api/recipes/:id/likes', dontCache, function(req, resp) {
     app.databases.recipes.findOne({_id:  req.params.id}, function(err, recipe) {
         if (recipe){
-            
-            switch (req.query.action) {
-                case "add":
+            var request = req.body;
+            switch (request.action) {
+                case "like":
                     recipe.rating.likes = recipe.rating.likes +1;
                 break;
-                case "remove":
+                case "dislike":
                     recipe.rating.likes = recipe.rating.likes -1;
                 break;
             }
             
             app.databases.recipes.save(recipe, function(err){
                 if(!err){
-                    resp.send(205);
+                    resp.send(JSON.stringify({}));
                 }
                 else {
                     resp.send(409);
