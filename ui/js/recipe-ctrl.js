@@ -20,7 +20,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
           tags: []
         };
         $scope.recipe = recipe;
-        $scope.original_id = null;
+        $scope.original_title = null;
         $scope.beginEdit();
         
         Page.setTitle('Neues Rezept...');
@@ -41,7 +41,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
                 recipe.original_servings = recipe.servings;
                 
                 $scope.recipe = recipe;
-                $scope.original_id = recipe._id;
+                $scope.original_title = recipe.title;
                 $scope.edit = false;
             });
         }).fail(function() {
@@ -160,7 +160,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
         if (!$scope.recipe._id) {
             $scope.saveNewRecipeToServer();
         }
-        else if($scope.original_id !== $scope.recipe._id)
+        else if($scope.original_title !== $scope.recipe.title)
         {
             renameAndSaveRecipeToServer($scope.recipe);
         }
