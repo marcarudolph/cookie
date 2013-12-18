@@ -106,8 +106,6 @@ function RecipeCtrl($scope, $routeParams, Page) {
     
     $scope.addLikeToRecipe = function()
     {
-        console.log("add");
-        console.log($scope.recipe._id);
         $.ajax({
             type: "POST",
             url: "/api/recipes/" + $scope.recipe._id + "/likes",
@@ -115,15 +113,13 @@ function RecipeCtrl($scope, $routeParams, Page) {
             contentType : 'application/json',
             data: angular.toJson({
                   "action": "like" })
-        }).done(function( response ){
-            console.log("done add");
-            window.location.reload();
+        }).done(function(response){
+            loadRecipe($scope.recipe._id);
         });
     };
 
     $scope.removeLikeFromRecipe = function()
     {
-        console.log("remove");
         $.ajax({
             type: "POST",
             url: "/api/recipes/" + $scope.recipe._id + "/likes",
@@ -131,8 +127,8 @@ function RecipeCtrl($scope, $routeParams, Page) {
             contentType : 'application/json',
             data: angular.toJson({
                   "action": "dislike" })
-        }).done(function(){
-            window.location.reload();
+        }).done(function(response){
+            loadRecipe($scope.recipe._id);
         });
     };
 
