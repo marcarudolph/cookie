@@ -190,16 +190,76 @@ app.get('/api/recipes/:id', dontCache, function(req, resp) {
 app.put('/api/recipes/:id', dontCache, function(req, resp) {
     
     var recipe = req.body;
-    recipe["_id"] = req.params.id;
+    recipe._id = req.params.id;
     
-    app.databases.recipes.save(recipe, function(err) {
-        if (!err)
-            resp.send(recipe);
-        else
+    getPreparedRecipe(recipe, function(err, prepared) {
+        if(!err){
+            app.databases.recipes.save(prepared, function(err) {
+                if (!err){
+                  resp.send(prepared);  
+                } 
+                else{ 
+                    resp.send(409);
+                }
+            });
+        }
+        else{
             resp.send(409);
+        }
     });
     
 });
+
+const RECIPE_TEMPLATE = {
+        "_id": null,
+        "origin": {
+            "system": "cookie"
+            //"user_id": "f232b6c9917b5c3a1c456061b84cf020", --> googleUserId
+            //"user_name": "Pol-Pot", --> googleUserName
+        },
+        "title": "Neues Rezept",
+        "subtitle": null,
+        "date": new Date(),
+        "rating": {
+            "likes": 0
+        },
+        "instructions": [],
+        "servings": 1,
+        "ingredients": []
+    };
+
+function getPreparedRecipe(recipe, done) {
+    app.databases.recipes.findOne({_id: recipe._id}, function(err, loadedRecipe) {
+
+        if (!err) {
+            if (loadedRecipe) {
+                //merge
+                loadedRecipe.subtitle = recipe.subtitle;
+                loadedRecipe.instructions = recipe.instructions;
+                loadedRecipe.servings = recipe.servings;
+                loadedRecipe.ingredients = recipe.ingredients;
+
+                done(null, loadedRecipe);
+            }
+            else {
+
+                var templateClone = JSON.parse(JSON.stringify(RECIPE_TEMPLATE));
+                //merge
+                templateClone._id = recipe._id;
+                templateClone.title = recipe.title;
+                templateClone.subtitle = recipe.subtitle;
+                templateClone.instructions = recipe.instructions;
+                templateClone.servings = recipe.servings;
+                templateClone.ingredients = recipe.ingredients;
+
+                done(null, templateClone);
+            }
+        }
+        else {
+            done("not found");
+        }
+    });
+}
 
 function handleRenameRecipe(req, resp) {
     var renameData = req.body;
@@ -208,6 +268,7 @@ function handleRenameRecipe(req, resp) {
     
     if (recipe){
         recipe._id = getIdFromRecipeTitle(renameData.title);
+        recipe.title = renameData.title;
 
         if(renameData.oldId !== recipe._id){
             console.log(recipe);
@@ -237,16 +298,22 @@ function handleRenameRecipe(req, resp) {
 function handleNewRecipe(req, resp) {
     var recipe = req.body;
     recipe._id = getIdFromRecipeTitle(recipe.title);
-    
-    app.databases.recipes.insert(recipe, function(err){
-        if(!err){
-            resp.send({id: recipe._id});
+
+    getPreparedRecipe(recipe, function(err, prepared) {
+        if (!err) {
+            app.databases.recipes.insert(prepared, function(err) {
+                if (!err) {
+                    resp.send({id: prepared._id});
+                }
+                else {
+                    resp.send(409);
+                }
+            });
         }
         else {
             resp.send(409);
         }
     });
-    
 }
 
 app.post('/api/recipes/', dontCache, function(req, resp) {
