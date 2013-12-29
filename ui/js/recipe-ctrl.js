@@ -15,6 +15,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
           },
           instructions: [],
           servings: 2,
+          original_servings: 2,
           ingredients: [],
           pictures: [],
           tags: []
