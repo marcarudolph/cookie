@@ -3,9 +3,9 @@ var express = require('express'),
     mongo = require('./mongo'),
     flash = require('connect-flash'),
     ck = require('./ck'),
-    passport = require('passport'),
-    GoogleStrategy = require('passport-google').Strategy,
-    app = express();    
+    db = require('./db'),
+    security = require('./security'),
+    app = express();
 
 
 app.use(express.cookieParser());
@@ -13,21 +13,9 @@ app.use(express.session({ secret: config.session.secret }));
 app.use(flash());
 app.use(express.bodyParser());
 
-function openDatabase(dbName, done) {
-    mongo.createClient(config.databases[dbName], function(err, collection) {
-        if (err) {
-            console.error("Opening the " + dbName + " collection failed with error " + err);
-            done(err);
-            return;
-        }
-        app.databases = app.databases || {};
-        app.databases[dbName] = collection;
-        done(null, collection);
-    });
-}
+db.init(app);
+security.init(app);
 
-openDatabase("recipes", function(){});
-openDatabase("users", function(){});    
     
     
 function dontCache(req, resp, next) {
@@ -52,55 +40,6 @@ function cachingStatic(req, resp, next) {
         baseStatic(req, resp, next);
     });
 }
-
-
-//Auth
-passport.serializeUser(function(user, done) {
-  done(null, user);
-});
-
-passport.deserializeUser(function(obj, done) {
-  done(null, obj);
-});
-
-passport.use(new GoogleStrategy({
-        returnURL: config.server.baseurl + '/auth/google/return',
-        realm: config.server.baseurl
-    },
-    function(identifier, profile, done) {
-      
-        app.databases.users.findOne({_id: identifier}, function(err, doc) {
-            if (doc) {
-                profile.identifier = identifier;
-                profile.authType = "google";
-                return done(null, profile);
-            }
-            else {
-                return done(null, false, { message: "No user with identifier " + identifier + " found"});
-            }
-        });
-    }
-));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.get('/auth/google', 
-  passport.authenticate('google', { failureRedirect: '/#/signin', failureFlash: true }),
-  function(req, res) {
-    res.redirect('/');
-  });
-
-app.get('/auth/google/return', 
-  passport.authenticate('google', { failureRedirect: '/#/', failureFlash: true }),
-  function(req, res) {
-    res.redirect('/');
-  });
-
-app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/');
-});
 
 
 
@@ -147,7 +86,7 @@ app.get('/api/upgradeAllRecipes', dontCache, function(req, resp) {
        resp.send("upgrade running");
 });
 
-app.get('/api/fetchCK/:id', dontCache, function(req, resp) {
+app.get('/api/fetchCK/:id', dontCache, security.ensureAuthenticated, function(req, resp) {
     
     ck.getRecipe(req.params.id, function(err, recipe) {
         if (err) {
@@ -166,7 +105,7 @@ app.get('/api/fetchCK/:id', dontCache, function(req, resp) {
     
 });
 
-app.get('/api/recipes/', dontCache, function(req, resp) {
+app.get('/api/recipes/', dontCache, security.ensureAuthenticated, function(req, resp) {
     
     app.databases.recipes.find(null, {title: true}).toArray(function(err, recipes) {
         if (!err) 
@@ -177,7 +116,7 @@ app.get('/api/recipes/', dontCache, function(req, resp) {
 });
 
 
-app.get('/api/recipes/:id', dontCache, function(req, resp) {
+app.get('/api/recipes/:id', dontCache, security.ensureAuthenticated, function(req, resp) {
     
     app.databases.recipes.findOne({_id: req.params.id}, function(err, doc) {
         if (doc)
@@ -187,7 +126,7 @@ app.get('/api/recipes/:id', dontCache, function(req, resp) {
     });
 });
 
-app.put('/api/recipes/:id', dontCache, function(req, resp) {
+app.put('/api/recipes/:id', dontCache, security.ensureAuthenticated, function(req, resp) {
     
     var recipe = req.body;
     recipe._id = req.params.id;
@@ -316,7 +255,7 @@ function handleNewRecipe(req, resp) {
     });
 }
 
-app.post('/api/recipes/', dontCache, function(req, resp) {
+app.post('/api/recipes/', dontCache, security.ensureAuthenticated, function(req, resp) {
     
     switch (req.query.action) {
         case "rename":
@@ -349,7 +288,7 @@ function getIdFromRecipeTitle(title){
     return tmp;
 }
 
-app.post('/api/recipes/:id/likes', dontCache, function(req, resp) {
+app.post('/api/recipes/:id/likes', dontCache, security.ensureAuthenticated, function(req, resp) {
     app.databases.recipes.findOne({_id:  req.params.id}, function(err, recipe) {
         if (recipe){
             var request = req.body;
