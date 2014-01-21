@@ -1,16 +1,29 @@
-<div class="panel panel-success col-xs-12">
-    <h3 class="panel-heading">Rezepte</h3>
-    Search: <input ng-model="query">
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-xs-1">
+                <span class="h3">Rezepte</span>
+            </div>
+            <div class="col-xs-offset-10 col-xs-1">
+                <a class="btn btn-default" href="#/recipes/"><span class="glyphicon glyphicon-plus"></span></a>
+            </div>
+        </div>
+    </div>
+    <div class="h5">
+        Suche: <input ng-model="query">
+    </div>
     <ul>
         <li ng-repeat="recipe in recipes | filter:query | orderBy:orderBy">
             <a href="#/recipes/{{recipe._id}}">{{recipe.title}}</a>
         </li>
     </ul>
-    <a class="glyphicon glyphicon-plus" href="#/recipes/"></a>
+    
 </div>
 <hr>
-<div class="panel panel-success col-xs-12">
-    <h5 class="panel-heading">Aus CK</h5>
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <span class="h5">Aus CK</span>
+    </div>
     <form ng-submit="getFromCK()">
         <input type="text" ng-model="ckId"  size="30"
                placeholder="CK ID">

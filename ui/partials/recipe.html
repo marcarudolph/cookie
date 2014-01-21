@@ -1,74 +1,80 @@
-<div ng-if="!edit" class="page-header">
-    <h1>
+<div ng-if="!edit">
+    <div class="h3">
         <span class="glyphicon glyphicon-pencil" ng-click="beginEdit()"></span>
-    </h1>
-    <h1>
+    </div>
+    <div class="h1">
         {{recipe.title}}
-    </h1>
-    <h4>
+    </div>
+    <div class="h4">
         <div style="float:left">{{recipe.subtitle}}</div>
         <div style="float:right">
             <span class="glyphicon glyphicon-thumbs-up" title="{{recipe.rating.likes}}" ng-click="addLikeToRecipe();"></span>
             <span class="glyphicon glyphicon-thumbs-down" title="{{recipe.rating.likes}}" ng-click="removeLikeFromRecipe();"></span>
         </div>
         <div style="clear:both"></div>
-    </h4>
+    </div>
 </div>
 
-<div ng-if="edit" class="page-header">
-    <h1>
+<div ng-if="edit">
+    <div class="h3">
         <span class="glyphicon glyphicon-ok" ng-click="saveRecipe();" ></span>
         <span class="glyphicon glyphicon-remove" ng-click="cancelEdit();" ></span>
-    </h1>
-    <h1>
+    </div>
+    <div class="h1">
         <input type="text" ng-model="recipe.title" placeholder="Titel eingeben"></input>
-    </h1>
-    <h4>
+    </div>
+    <div class="h4">
         <input type="text" ng-model="recipe.subtitle" placeholder="Untertitel eingeben"></input>
-    </h4>
+    </div>
 </div>
 
 <div class="row">
-    <div class="panel panel-success col-xs-12 col-md-7">
-        <h3 class="panel-heading">Zubereitung</h3>
-
-        <ol>
-            <li ng-repeat="line in recipe.instructions track by $index">
-                <p class="lead" markdown="recipe.instructions[$index]" ng-if="!edit"></p>
-                <div ng-if="edit">
-                    <textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
-                    <div class="glyphicon glyphicon-remove" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
-                </div>
-            </li>
-        </ol>
-        <div class="glyphicon glyphicon-plus" ng-hide="!edit" ng-click="addInstructionToRecipe();"  ></div>
+    <div class="col-xs-12 col-md-7">
+        <div class="panel panel-success">
+            <div class="panel-heading"><span class="h3">Zubereitung</span></div>
+            <ol>
+                <li ng-repeat="line in recipe.instructions track by $index">
+                    <p class="lead" markdown="recipe.instructions[$index]" ng-if="!edit"></p>
+                    <div ng-if="edit">
+                        <textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
+                        <div class="glyphicon glyphicon-remove" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
+                    </div>
+                </li>
+            </ol>
+            <div class="glyphicon glyphicon-plus" ng-hide="!edit" ng-click="addInstructionToRecipe();"  ></div>
+        </div>
     </div>
     <div class="clearfix visible-xs"></div>
-    <div class="panel panel-success col-xs-12 col-md-offset-1 col-md-4">
-        <h3 class="panel-heading">Zutaten f&uuml;r
-            <input style="width: 40px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/\d+(\.\d{1,2})?/"> </input>
-            <span ng-if="edit">Berechnungsgrundlage:</span>
-            <input ng-if="edit" style="width: 40px" type="text" class="" ng-model="recipe.original_servings" required ng-pattern="/^([1-9][0-9]*)$/"></input>
-        </h3>
-        <ul class="list-group">
-            <li class="list-group-item" ng-repeat="ing in recipe.ingredients" >
-                <article ng-if="!edit" ng-click="ing.done = !ing.done" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
-                    <span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
-                    <span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
-                    <span ng-if="ing.unit">{{ing.unit}}</span>
-                    <span markdown="ing.name"></span>
-                    <span ng-if="ing.comment">{{ing.comment}}</span>
-                    <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
-                </article>
-                <article ng-if="edit">
-                    <input type="text" ng-model="ing.quantity_calc" style="width: 50px"></input>
-                    <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="Einh."></input>
-                    <input type="text" ng-model="ing.name" placeholder="Name"></input>
-                    <input type="text" ng-model="ing.comment" placeholder="Kommentar" ng-keydown="handleIngredientTabKey($event, ing)"></input>   
-                    <div class="glyphicon glyphicon-remove" ng-click="deleteIngredient(ing);"></div>
-                </article>
-            </li>
-        </ul>
-        <div class="glyphicon glyphicon-plus" ng-if="edit" ng-click="addIngredientToRecipe();"></div>
+    <div class="col-xs-12 col-md-offset-1 col-md-4">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <span class="h3">
+                    Zutaten f&uuml;r
+                    <input style="width: 40px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/\d+(\.\d{1,2})?/"> </input>
+                    <span ng-if="edit">Berechnungsgrundlage:</span>
+                    <input ng-if="edit" style="width: 40px" type="text" class="" ng-model="recipe.original_servings" required ng-pattern="/^([1-9][0-9]*)$/"></input>
+                </span>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item" ng-repeat="ing in recipe.ingredients" >
+                    <article ng-if="!edit" ng-click="ing.done = !ing.done" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
+                        <span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
+                        <span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
+                        <span ng-if="ing.unit">{{ing.unit}}</span>
+                        <span markdown="ing.name"></span>
+                        <span ng-if="ing.comment">{{ing.comment}}</span>
+                        <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
+                    </article>
+                    <article ng-if="edit">
+                        <input type="text" ng-model="ing.quantity_calc" style="width: 50px"></input>
+                        <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="Einh."></input>
+                        <input type="text" ng-model="ing.name" placeholder="Name"></input>
+                        <input type="text" ng-model="ing.comment" placeholder="Kommentar" ng-keydown="handleIngredientTabKey($event, ing)"></input>   
+                        <div class="glyphicon glyphicon-remove" ng-click="deleteIngredient(ing);"></div>
+                    </article>
+                </li>
+            </ul>
+            <div class="glyphicon glyphicon-plus" ng-if="edit" ng-click="addIngredientToRecipe();"></div>
+        </div>
     </div>
 </div>
