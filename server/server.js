@@ -109,7 +109,7 @@ app.put('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated
     var recipe = req.body;
     recipe._id = req.params.id;
     
-    recipeServices.getPreparedRecipe(recipe, function(err, prepared) {
+    recipeServices.mergeUserChangeableProperties(recipe, function(err, prepared) {
         if(!err){
             app.databases.recipes.save(prepared, function(err) {
                 if (!err){

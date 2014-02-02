@@ -3,8 +3,6 @@ const RECIPE_TEMPLATE = {
         "_id": null,
         "origin": {
             "system": "cookie"
-            //"user_id": "f232b6c9917b5c3a1c456061b84cf020", --> googleUserId
-            //"user_name": "Pol-Pot", --> googleUserName
         },
         "title": "Neues Rezept",
         "subtitle": null,
@@ -19,7 +17,7 @@ const RECIPE_TEMPLATE = {
 
 var recipeServices = {
     init: function(app) {
-        recipeServices.getPreparedRecipe = function(recipe, done) {
+        recipeServices.mergeUserChangeableProperties = function(recipe, done) {
             app.databases.recipes.findOne({_id: recipe._id}, function(err, loadedRecipe) {
 
                 if (!err) {
@@ -47,7 +45,7 @@ var recipeServices = {
                     }
                 }
                 else {
-                    done("not found");
+                    done(err);
                 }
             });
         }
@@ -89,7 +87,7 @@ var recipeServices = {
             var recipe = req.body;
             recipe._id = getIdFromRecipeTitle(recipe.title);
 
-            recipeServices.getPreparedRecipe(recipe, function(err, prepared) {
+            recipeServices.mergeUserChangeableProperties(recipe, function(err, prepared) {
                 if (!err) {
                     app.databases.recipes.insert(prepared, function(err) {
                         if (!err) {
