@@ -1,4 +1,5 @@
 var express = require('express'),
+    sessions = require("client-sessions"),
     config = require('../config/cookie-config.js'),
     mongo = require('./mongo'),
     flash = require('connect-flash'),
@@ -10,8 +11,13 @@ var express = require('express'),
     app = express();
 
 
-app.use(express.cookieParser());
-app.use(express.session({ secret: config.session.secret }));
+//app.use(express.cookieParser());
+//app.use(express.session({ secret: config.session.secret }));
+app.use(sessions({
+  cookieName: 'session',
+  secret: config.session.secret,
+  duration: 14 * 24 * 60 * 60 * 1000
+}));
 app.use(flash());
 app.use(express.bodyParser());
 
@@ -29,8 +35,8 @@ app.get('/api/init', cacheControl.dontCache, function(req, resp) {
     
     if (req.user) {
         appData.user = {
-            name: req.user.displayName,
-            id: req.user.emails[0],
+            name: req.user.email,
+            id: req.user._id,
             authType: req.user.authType
         };
     }

@@ -2,33 +2,47 @@ var config = require('../config/cookie-config.js'),
 	passport = require('passport'),
     GoogleStrategy = require('passport-google').Strategy;
 
+
 module.exports = {
     init: function(app) {
+    	
+		function findUserById(identifier, done) {
+				      
+		    app.databases.users.findOne({_id: identifier}, function(err, doc) {
+		    	if (err) {
+		    		return done(err, null);
+		    	}
+		        else if (doc) {
+		            return done(null, doc);
+		        }
+		        else {
+		            return done(null, false, { message: "No user with identifier " + identifier + " found"});
+		        }
+		    });
+
+		}
 
 		passport.serializeUser(function(user, done) {
-		  done(null, user);
+			done(null, user._id);
 		});
 
-		passport.deserializeUser(function(obj, done) {
-		  done(null, obj);
+		passport.deserializeUser(function(id, done) {
+    		findUserById(id, function(err, user, msg) {
+    			if (err || msg) {
+    				return done((err || msg), null);
+    			}
+    			else {
+    				return done(null, user);
+    			}
+    		});
 		});
 
 		passport.use(new GoogleStrategy({
 		        returnURL: config.server.baseurl + '/auth/google/return',
 		        realm: config.server.baseurl
 		    },
-		    function(identifier, profile, done) {
-		      
-		        app.databases.users.findOne({_id: identifier}, function(err, doc) {
-		            if (doc) {
-		                profile.identifier = identifier;
-		                profile.authType = "google";
-		                return done(null, profile);
-		            }
-		            else {
-		                return done(null, false, { message: "No user with identifier " + identifier + " found"});
-		            }
-		        });
+		    function (identifier, profile, done) {
+		    	findUserById(identifier, done);
 		    }
 		));		
 
