@@ -1,4 +1,7 @@
-var express = require('express');
+var express = require('express'),
+    config = require('../config/cookie-config.js');
+
+var cacheMaxAge = config.server.cacheMaxAge || 0;
 
 function dontCache(req, resp, next) {
     resp.setHeader('Cache-Control', 'no-cache, no-store, max-age=0');
@@ -12,7 +15,7 @@ function dontCacheIfNoOtherPolicyPresent(req, resp, next) {
 }
 
 function doCache(req, resp, next) {
-    resp.setHeader('Cache-Control', 'public, max-age=120');
+    resp.setHeader('Cache-Control', 'public, max-age=' + cacheMaxAge);
     next();
 }    
 
