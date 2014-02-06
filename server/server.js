@@ -11,8 +11,6 @@ var express = require('express'),
     app = express();
 
 
-//app.use(express.cookieParser());
-//app.use(express.session({ secret: config.session.secret }));
 app.use(sessions({
   cookieName: 'session',
   secret: config.session.secret,
