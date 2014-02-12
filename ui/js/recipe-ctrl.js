@@ -39,17 +39,26 @@ function RecipeCtrl($scope, $routeParams, Page) {
 
             $scope.displayCopy = JSON.parse(JSON.stringify(recipe));
             $scope.$apply(function () {
-                $scope.displayCopy.ingredients.map(function (ing) {
-                    ing.done = false;
-                    ing.quantity_calc = ing.quantity;
-                });
-
-            $scope.original_title = recipe.title;
-            $scope.edit = false;
+                updateCalculatedProperties();
+                $scope.original_title = recipe.title;
+                $scope.edit = false;
             });
         }).fail(function() {
             Page.setTitle('Ooops...');
         });        
+    }
+
+    function updateCalculatedProperties() {
+        $scope.displayCopy.ingredients.map(function (ing) {
+            ing.done = false;
+            ing.quantity_calc = ing.quantity;
+            ing.padded_comment = ing.comment;
+
+            var startsWithWhitespaceOrPunctuation = /^\W/;
+            if (!startsWithWhitespaceOrPunctuation.test(ing.comment))
+                ing.padded_comment = " " + ing.padded_comment;
+        });
+        $scope.recalculateServings();
     }
 
     function refreshDisplayCopy(){
@@ -59,7 +68,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
         $scope.displayCopy.ingredients.forEach(function(ing) {
             ing.done = false;
         });
-        $scope.recalculateServings();
+        updateCalculatedProperties();
     }
     
     function insertNewElementOnLastElementTabKey(event, element, array, newHandler){

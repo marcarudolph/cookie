@@ -38,8 +38,7 @@
                             <span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
                             <span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
                             <span ng-if="ing.unit">{{ing.unit}}</span>
-                            <span markdown="ing.name"></span>
-                            <span ng-if="ing.comment">{{ing.comment}}</span>
+                            <span markdown="ing.name"></span><span ng-if="ing.comment">{{ing.padded_comment}}</span>
                             <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
                         </article>                    
                     </li>
