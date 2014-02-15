@@ -1,1 +1,1 @@
-pm2 start ./server/server.js -i max --name cookie-server
+pm2 start ./server/server.js -i 1 --name cookie-server
