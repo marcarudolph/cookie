@@ -56,15 +56,16 @@ var recipeServices = {
             app.databases.recipes.findOne({_id: renameData.oldId}, function(err, recipe) {
             
             if (recipe){
-                recipe._id = getIdFromRecipeTitle(renameData.title);
-                recipe.title = renameData.title;
+                if(getIdFromRecipeTitle(renameData.title) !== getIdFromRecipeTitle(recipe.title)){
 
-                if(renameData.oldId !== recipe._id){
-                    app.databases.recipes.insert(recipe, function(err){
+                    delete recipe._id;
+                    recipe.title = renameData.title;
+
+                    recipeServices.insertRecipe(recipe, function(err, insertedRecipe){
                         if(!err){
                             app.databases.recipes.remove({_id: renameData.oldId}, function(err){
                                 if(!err){
-                                    resp.send({id: recipe._id});
+                                    resp.send({id: insertedRecipe._id});
                                 }
                                 else {
                                     resp.send(410);
@@ -76,6 +77,9 @@ var recipeServices = {
                         }
                     });
                 }
+                else{
+                   resp.send({id: recipe._id}); 
+                }
             }
             else
                 resp.send(404);
@@ -85,13 +89,12 @@ var recipeServices = {
 
         recipeServices.handleNewRecipe = function(req, resp) {
             var recipe = req.body;
-            recipe._id = getIdFromRecipeTitle(recipe.title);
 
             recipeServices.mergeUserChangeableProperties(recipe, function(err, prepared) {
                 if (!err) {
-                    app.databases.recipes.insert(prepared, function(err) {
+                    recipeServices.insertRecipe(prepared, function(err, insertedRecipe){
                         if (!err) {
-                            resp.send({id: prepared._id});
+                            resp.send({id: insertedRecipe._id});
                         }
                         else {
                             resp.send(409);
@@ -100,6 +103,32 @@ var recipeServices = {
                 }
                 else {
                     resp.send(409);
+                }
+            });
+        }
+
+        recipeServices.insertRecipe = function(recipe, done)
+        {
+            if(!recipe._id){
+                recipe._id = getIdFromRecipeTitle(recipe.title);
+            }
+
+            app.databases.recipes.insert(recipe, function(err) {
+                if (!err) {
+                    done(null, recipe);
+                }
+                else{
+                    if(err.code == 11000){
+                        if(! /-\d+$/.test(recipe._id)){
+                          recipe._id = recipe._id + "-0";  
+                        }
+                        
+                        recipe._id = recipe._id.replace(/\d+$/, function(n){ return ++n; });
+                        recipeServices.insertRecipe(recipe, done);
+                    }
+                    else{
+                        done(err, null);
+                    }
                 }
             });
         }
@@ -117,7 +146,8 @@ var recipeServices = {
             tmp = tmp.replace(/ß/g,"ss");
             
             return tmp;
-        }        
+        } 
+
     }
 };
 module.exports = recipeServices;

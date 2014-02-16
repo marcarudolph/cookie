@@ -201,7 +201,7 @@ function RecipeCtrl($scope, $routeParams, Page) {
             contentType : 'application/json',
             data: angular.toJson($scope.recipe)
         }).done(function(response){
-            loadRecipe(response.id);
+            window.location.href = "/#/recipes/" +  response.id;
         });        
     };
     

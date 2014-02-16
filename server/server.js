@@ -76,9 +76,9 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated
             return;
         }
         
-        app.databases.recipes.save(recipe, function(err) {
+        recipeServices.insertRecipe(recipe, function(err, insertedRecipe) {
             if (!err)
-                resp.send({_id: recipe._id});    
+                resp.send({_id: insertedRecipe._id});    
             else
                 resp.send(409);
         });

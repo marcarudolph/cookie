@@ -44,7 +44,6 @@ function convertRecipe(url, ckResult, next) {
     }
 
     var recipe = {
-        "_id": getNameFromFrontendUrl(ckr.rezept_frontend_url),
         "origin": {
             "system": "ck",
             "id": ckr.rezept_id,
@@ -115,12 +114,6 @@ function getBiggestPictureFormat(formats) {
     }
     
     return biggestFormat;
-}
-
-function getNameFromFrontendUrl(url) {
-    var parts = url.split('/'),
-        name = parts[parts.length - 1].split('.')[0];
-    return name;
 }
 
 function splitInstructions(zubereitung) {
