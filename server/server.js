@@ -179,27 +179,30 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
         if (recipe){
             var files = req.files;
             var picturesToInsert = [];
+            var rawPictures = [];
 
             for(var key in files){
                 var file = files[key]; 
                 var newFileName = guid() + ".jpg";
-                var pic = {
-                            "file": newFileName,
-                            "user_name": req.user.email
-                };
 
-                picturesToInsert.push(pic);
-                recipe.pictures=recipe.pictures||[];
-                recipe.pictures.push(pic);
+                picturesToInsert.push({
+                                        "file": newFileName,
+                                        "user_name": req.user.email,
+                                     });                
+
+                rawPictures.push({
+                                    "localPath": file, 
+                                    "newFileName": newFileName
+                                });
             }
                 
             var convertedCount = 0;
-            for (var index = 0; index < picturesToInsert.length; ++index) {
-                (function(filename){
-                    var newFilePath = config.pictures.directory + "//" +  filename;
-                    var newThumbnailPath = config.pictures.directory + "//thumbnails//" +  filename;
+            for (var index = 0; index < rawPictures.length; ++index) {
+                (function(index){
+                    var newFilePath = config.pictures.directory + "//" +  rawPictures[index].newFileName;
+                    var newThumbnailPath = config.pictures.directory + "//thumbnails//" +  rawPictures[index].newFileName;
 
-                    gm(file.path)
+                    gm(rawPictures[index].localPath.path)
                         .resize(2048)
                         .quality(45)
                         .autoOrient()
@@ -209,15 +212,18 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
                                 resp.send(500);
                             }
                             else {
-                                fs.unlink(file.path);                                
+                                fs.unlink(rawPictures[index].localPath.path);                                
                                 gm(newFilePath)
                                     .resize(150)
                                     .write(newThumbnailPath, function (err) {
                                         if(!err){
+                                            delete rawPictures[index].localPath;
                                             convertedCount++;
                                 
+                                            if(convertedCount === rawPictures.length) {
+                                                recipe.pictures=recipe.pictures||[];
+                                                recipe.pictures = recipe.pictures.concat(picturesToInsert);
 
-                                            if(convertedCount === picturesToInsert.length) {
                                                 app.databases.recipes.save(recipe, function(err){
                                                     if(!err){
                                                         resp.send(picturesToInsert);
@@ -235,7 +241,7 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
                                     });
                             }
                         });   
-                })(picturesToInsert[index].file);
+                })(index);
             }                                      
         }
         else{
