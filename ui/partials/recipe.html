@@ -45,7 +45,7 @@
                 </ul>           
             </div>
         </div>
-    </div>
+    </div>    
 </div>
 
 <div ng-if="edit">
@@ -93,6 +93,31 @@
                     </li>
                 </ul>
                 <div class="glyphicon glyphicon-plus" ng-click="addIngredientToRecipe();"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="row" >
+    <div class="col-xs-12 col-md-12">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <span class="h3">Bilder</span>
+                <div class="pull-right">
+                    <div class="btn btn-default btn-file" ng-if="!edit">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        <input type="file" ng-file-select="onFileSelect($files)" multiple></input>
+                    </div>
+                </div>
+            </div>  
+            <div>
+                <div style="float: clear;">  
+                    <div class="thumbnail" style="float:left; margin-right:10px; margin-bottom:10px;"  ng-repeat="pic in displayCopy.pictures">
+                        <img ng-src="/pics/thumbnails/{{pic.file}}" style="max-width:150px;"></img>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
