@@ -1,0 +1,11 @@
+{
+    "name":"cookie-www",
+    "description":"cookie www server",
+    "version":"0.0.1",
+    "private":true,
+    "dependencies":{
+        "elasticsearch": "*",
+        "es6-promise": "*",
+        "request": "*"
+    }
+}
