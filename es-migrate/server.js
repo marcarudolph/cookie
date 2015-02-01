@@ -23,6 +23,8 @@ getAllRecipes()
 		var bulk = [];
 		recipes.forEach(function(recipe) {
 			bulk.push({index: {_index: "cookie", _type: "recipe", _id: recipe._id }});
+			
+			recipe._id = undefined;
 			bulk.push(recipe);
 		});
 		console.log("Bulking " + recipes.length)

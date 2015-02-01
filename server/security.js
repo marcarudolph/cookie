@@ -6,21 +6,25 @@ var config = require('../config/cookie-config.js'),
 module.exports = {
     init: function(app) {
     	
-		function findUserById(identifier, done) {
-				      
-		    app.databases.users.findOne({_id: identifier}, function(err, doc) {
-		    	if (err) {
-		    		return done(err, null);
-		    	}
-		        else if (doc) {
-		            return done(null, doc);
-		        }
-		        else {
-		            return done(null, false, { message: "No user with identifier " + identifier + " found"});
-		        }
-		    });
-
-		}
+        function findUserById(identifier, done) {
+            app.database.get({
+                index: config.indexes.cookie,
+                type: "user",
+                id: identifier
+            })
+            .then(function(resp) {
+            	var user = resp._source;
+            	user._id = resp._id;
+                return done(null, user);
+            })
+            .catch(function(err) {
+            	console.log(err);
+                if (err.status == 404)
+                    return done(null, false, { message: "No user with identifier " + identifier + " found"});
+                else
+                    return done(err, null);
+            });
+        }
 
 		passport.serializeUser(function(user, done) {
 			done(null, user._id);

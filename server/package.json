@@ -5,8 +5,10 @@
     "private":true,
     "dependencies":{
         "express": "*",
+        "body-parser": "*",
         "async": "*",
-        "mongodb": "*",
+        "elasticsearch": "*",
+        "es6-promise": "*",
         "atob": "*",
         "passport": "*",
         "passport-google": "*",

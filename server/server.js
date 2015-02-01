@@ -1,10 +1,13 @@
+
+"use strict";
+
 var express = require('express'),
+    bodyParser = require('body-parser'),
     sessions = require("client-sessions"),
     config = require('../config/cookie-config.js'),
-    mongo = require('./mongo'),
+    elasticsearch = require("elasticsearch"),
     flash = require('connect-flash'),
     ck = require('./ck'),
-    db = require('./db'),
     cacheControl = require('./cache-control'),
     recipeServices = require('./recipe-services'),
     security = require('./security'),
@@ -17,15 +20,14 @@ app.use(sessions({
   cookieName: 'session',
   secret: config.session.secret,
   duration: 14 * 24 * 60 * 60 * 1000
-}));
+}));    
 app.use(flash());
-app.use(express.bodyParser());
+app.use(bodyParser());
 
-db.init(app);
+app.database = new elasticsearch.Client(config.database);
+
 security.init(app);
 recipeServices.init(app);
-
-
 
 app.get('/api/init', cacheControl.dontCache, function(req, resp) {
     
@@ -44,6 +46,7 @@ app.get('/api/init', cacheControl.dontCache, function(req, resp) {
     resp.send(appData);
 });
 
+/*
 app.get('/api/upgradeAllRecipes', cacheControl.dontCache, function(req, resp) {
        app.databases.recipes.find().toArray(function(err, docs) {
             docs.map(function(recipe){
@@ -69,6 +72,7 @@ app.get('/api/upgradeAllRecipes', cacheControl.dontCache, function(req, resp) {
        
        resp.send("upgrade running");
 });
+*/
 
 app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
@@ -91,22 +95,37 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated
 
 app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
-    app.databases.recipes.find(null, {title: true}).toArray(function(err, recipes) {
-        if (!err) 
-            resp.send(recipes);
-        else
-            resp.send(404);
-    });    
+    app.database.search({
+        index: config.indexes.cookie,
+        type: "recipe",
+        size: 1001,
+        _source: ["title", "_id"]
+    })
+    .then(function(results) {
+        var recipes = results.hits.hits.map(function(hit) { return hit._source; });
+        return resp.send(recipes);
+    })
+    .catch(function(err) {
+        console.log(err.stack);
+        return resp.send(500);
+    });
 });
 
 
-app.get('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
-    
-    app.databases.recipes.findOne({_id: req.params.id}, function(err, doc) {
-        if (doc)
-            resp.send(doc);
-        else
-            resp.send(404);
+app.get('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {    
+
+    recipeServices.getRecipe(req.params.id)
+    .then(function(recipe) {
+        return resp.send(recipe);
+    })
+    .catch(function(err) {
+        if (err.status == 404) {
+            return resp.send(404);
+        }
+        else {
+            console.log(err.stack);
+            return resp.send(500);
+        }
     });
 });
 
@@ -115,23 +134,22 @@ app.put('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated
     var recipe = req.body;
     recipe._id = req.params.id;
     
-    recipeServices.mergeUserChangeableProperties(recipe, function(err, prepared) {
-        if(!err){
-            app.databases.recipes.save(prepared, function(err) {
-                if (!err){
-                  resp.send(prepared);  
-                } 
-                else{ 
-                    resp.send(409);
-                }
-            });
-        }
-        else{
-            resp.send(409);
-        }
+    recipeServices.mergeUserChangeableProperties(recipe)
+    .then(function(recipeToSave) {
+        recipeServices.upsertRecipe(recipeToSave)
+        .then(function() {
+            return resp.send(recipeToSave);  
+        })
+        .catch(function(err) {
+            console.log(err.stack);
+            return resp.send(500);
+        });
+    })
+    .catch(function(err) {
+        console.log(err.stack);
+        return resp.send(500);
     });
-    
-});
+})
 
 app.post('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
