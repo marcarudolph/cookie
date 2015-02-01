@@ -6,6 +6,7 @@
     "dependencies":{
         "express": "*",
         "body-parser": "*",
+        "multer": "*",
         "async": "*",
         "elasticsearch": "*",
         "es6-promise": "*",
@@ -14,6 +15,7 @@
         "passport-google": "*",
         "connect-flash": "*",
         "client-sessions": "*",
+        "shortid": "*",
         "gm": "*"
     }
 }

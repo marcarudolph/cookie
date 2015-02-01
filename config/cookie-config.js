@@ -5,9 +5,10 @@ var dbCreds = process.env.ES_CREDS ? process.env.ES_CREDS + "@" : "",
 
 var config = {
     server: {
-        port:   8080,
+        port:   8088,
         ip: "0.0.0.0",
-        baseurl: 'http://localhost:8080' 
+        baseurl: 'http://localhost:8088',
+        uploadTempPath: "\\temp\\upload"
     },
     database: { host: connString },
     indexes: {
@@ -17,7 +18,7 @@ var config = {
         secret: "hashmeifyoucan"
     },
     pictures: {
-        directory: "/tmp/cookiepics"
+        directory: "\\temp\\cookiepics"
     }
 };
 

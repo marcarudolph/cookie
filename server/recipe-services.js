@@ -24,8 +24,7 @@ var recipeServices = {
                 app.database.get({
                     index: config.indexes.cookie,
                     type: "recipe",
-                    id: id,
-                    _source: ["*", "_id"]
+                    id: id
                 })
                 .then(function(res) {
                     res._source._id = id;
@@ -35,128 +34,128 @@ var recipeServices = {
             });
         }
 
-        recipeServices.mergeUserChangeableProperties = function(newRecipe) {
+        recipeServices.mergeUserChangeableProperties = function(recipe) {
             return new Promise(function(resolve, reject) {
-                recipeServices.getRecipe(newRecipe._id)
+                function createAndMergeNewRecipeFromTemplate() {
+                    var newRecipe = JSON.parse(JSON.stringify(RECIPE_TEMPLATE));
+                    newRecipe._id = recipe._id;
+                    newRecipe.title = recipe.title;
+                    newRecipe.subtitle = recipe.subtitle;
+                    newRecipe.instructions = recipe.instructions;
+                    newRecipe.servings = recipe.servings;
+                    newRecipe.ingredients = recipe.ingredients;
+
+                    return resolve(newRecipe);
+                }
+
+                if (!recipe._id)
+                    return createAndMergeNewRecipeFromTemplate();
+
+                recipeServices.getRecipe(recipe._id)
                 .then(function(existingRecipe) {
                     var mergedRecipe = existingRecipe;
-                    mergedRecipe.subtitle = newRecipe.subtitle;
-                    mergedRecipe.instructions = newRecipe.instructions;
-                    mergedRecipe.servings = newRecipe.servings;
-                    mergedRecipe.ingredients = newRecipe.ingredients;
+                    mergedRecipe.subtitle = recipe.subtitle;
+                    mergedRecipe.instructions = recipe.instructions;
+                    mergedRecipe.servings = recipe.servings;
+                    mergedRecipe.ingredients = recipe.ingredients;
 
-                    resolve(mergedRecipe);
+                    return resolve(mergedRecipe);
                 })
                 .catch(function(err) {
-                    if (err.status === 404) {
-                        var newRecipe = JSON.parse(JSON.stringify(RECIPE_TEMPLATE));
-                        newRecipe._id = recipe._id;
-                        newRecipe.title = recipe.title;
-                        newRecipe.subtitle = recipe.subtitle;
-                        newRecipe.instructions = recipe.instructions;
-                        newRecipe.servings = recipe.servings;
-                        newRecipe.ingredients = recipe.ingredients;
-
-                        resolve(newRecipe);
-                    }
-                    else {
-                        reject(err);
-                    }
+                    return reject(err);
                 });
             });
         }
 
-        recipeServices.handleRenameRecipe = function(req, resp) {
-            var renameData = req.body;
-            
-            app.databases.recipes.findOne({_id: renameData.oldId}, function(err, recipe) {
-            
-            if (recipe){
-                if(getIdFromRecipeTitle(renameData.title) !== getIdFromRecipeTitle(recipe.title)){
-
+        recipeServices.renameRecipe = function(renameData) {
+            return new Promise(function(resolve, reject) {
+                recipeServices.getRecipe(renameData.oldId)
+                .then(function(recipe) {
+                    if (getIdFromRecipeTitle(renameData.title) === getIdFromRecipeTitle(recipe.title)) {
+                        return resolve(recipe);
+                    }
+                    
                     delete recipe._id;
                     recipe.title = renameData.title;
 
-                    recipeServices.insertRecipe(recipe, function(err, insertedRecipe){
-                        if(!err){
-                            app.databases.recipes.remove({_id: renameData.oldId}, function(err){
-                                if(!err){
-                                    resp.send({id: insertedRecipe._id});
-                                }
-                                else {
-                                    resp.send(410);
-                                }
-                            });
-                        }
-                        else {
-                            resp.send(409);
-                        }
-                    });
-                }
-                else{
-                   resp.send({id: recipe._id}); 
-                }
-            }
-            else
-                resp.send(404);
-                
-            });    
-        }
-
-        recipeServices.handleNewRecipe = function(recipe) {
-            return new Promise(function(resolve, reject) {
-                recipeServices.mergeUserChangeableProperties(recipe)
-                .then(function(recipeToSave) {
-                    recipeServices.insertRecipe(prepared, function(err, insertedRecipe) {
-                        if (!err) {
-                            resolve({id: insertedRecipe._id});
-                        }
-                        else {
-                            reject(err);
-                        }
-                    });                
+                    recipeServices.setUniqueId(recipe)
+                    .then(recipeServices.upsertRecipe)
+                    .then(function() {
+                        return recipeServices.deleteRecipe(renameData.oldId);
+                    })
+                    .then(function() {
+                        return resolve(recipe);
+                    })
+                    .catch(reject);
                 })
                 .catch(reject);
             });
         }
 
+        recipeServices.updateRecipe = function(recipe) {            
+            return recipeServices.mergeUserChangeableProperties(recipe)
+                    .then(recipeServices.upsertRecipe);   
+        }        
+
+        recipeServices.newRecipe = function(recipe) {
+            return recipeServices.mergeUserChangeableProperties(recipe)
+                    .then(recipeServices.setUniqueId)
+                    .then(recipeServices.upsertRecipe);   
+        }
+
         recipeServices.upsertRecipe = function(recipe) {
-            var id = recipe._id,
-                body = JSON.parse(JSON.stringify(recipe));
+            return new Promise(function(resolve, reject) {
+                var id = recipe._id,
+                    body = JSON.parse(JSON.stringify(recipe));
 
-            body._id = undefined;
+                body._id = undefined;
 
-            return app.database.index({
-                index: config.indexes.cookie,
-                type: "recipe",
-                id: id,
-                body: body
+                app.database.index({
+                    index: config.indexes.cookie,
+                    type: "recipe",
+                    id: id,
+                    body: body
+                })
+                .then(function() {
+                    resolve(recipe);
+                })
+                .catch(reject);
             });
         }
 
+        recipeServices.deleteRecipe = function(recipeId) {
+            return app.database.delete({
+                index: config.indexes.cookie,
+                type: "recipe",
+                id: recipeId
+            });
+        }
 
-        recipeServices.insertRecipe = function(recipe, done) {
+        recipeServices.setUniqueId = function(recipe) {
             if(!recipe._id){
                 recipe._id = getIdFromRecipeTitle(recipe.title);
-            }
-
-            app.databases.recipes.insert(recipe, function(err) {
-                if (!err) {
-                    done(null, recipe);
-                }
-                else{
-                    if(err.code == 11000){
+            }            
+            return new Promise(function(resolve, reject) {
+                app.database.exists({
+                    index: config.indexes.cookie,
+                    type: "recipe",
+                    id: recipe._id
+                })
+                .then(function(exists) {
+                    if (!exists) {
+                        return resolve(recipe);
+                    }
+                    else {
                         if(! /-\d+$/.test(recipe._id)){
                           recipe._id = recipe._id + "-0";  
                         }
                         
                         recipe._id = recipe._id.replace(/\d+$/, function(n){ return ++n; });
-                        recipeServices.insertRecipe(recipe, done);
+                        recipeServices.setUniqueId(recipe)
+                        .then(resolve)
+                        .catch(reject);                        
                     }
-                    else{
-                        done(err, null);
-                    }
-                }
+                });
             });
         }
 

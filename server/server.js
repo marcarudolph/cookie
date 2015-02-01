@@ -3,7 +3,10 @@
 
 var express = require('express'),
     bodyParser = require('body-parser'),
+    multer = require('multer'),
     sessions = require("client-sessions"),
+    shortid = require("shortid"),
+    Promise = require('es6-promise').Promise,
     config = require('../config/cookie-config.js'),
     elasticsearch = require("elasticsearch"),
     flash = require('connect-flash'),
@@ -22,7 +25,14 @@ app.use(sessions({
   duration: 14 * 24 * 60 * 60 * 1000
 }));    
 app.use(flash());
-app.use(bodyParser());
+app.use(bodyParser.json());
+
+app.use(multer({
+  dest: config.server.uploadTempPath,
+  rename: function (fieldname, filename) {
+    return filename.replace(/\W+/g, '-').toLowerCase() + Date.now()
+  }
+}));
 
 app.database = new elasticsearch.Client(config.database);
 
@@ -82,13 +92,13 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated
             return;
         }
         
-        recipeServices.insertRecipe(recipe, function(err, insertedRecipe) {
-            if (!err)
-                resp.send({_id: insertedRecipe._id});    
-            else
-                resp.send(409);
-        });
-        
+        recipeServices.newRecipe(recipe)
+        .then(function(insertedRecipe) {
+            return resp.send(insertedRecipe);
+        })
+        .catch(function(err) {
+            sendError(resp, err);
+        });            
     });
     
 });
@@ -99,15 +109,17 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
         index: config.indexes.cookie,
         type: "recipe",
         size: 1001,
-        _source: ["title", "_id"]
+        _source: ["title"]
     })
     .then(function(results) {
-        var recipes = results.hits.hits.map(function(hit) { return hit._source; });
+        var recipes = results.hits.hits.map(function(hit) {
+            hit._source._id = hit._id;
+            return hit._source;
+        });
         return resp.send(recipes);
     })
     .catch(function(err) {
-        console.log(err.stack);
-        return resp.send(500);
+        sendError(resp, err);
     });
 });
 
@@ -119,13 +131,7 @@ app.get('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated
         return resp.send(recipe);
     })
     .catch(function(err) {
-        if (err.status == 404) {
-            return resp.send(404);
-        }
-        else {
-            console.log(err.stack);
-            return resp.send(500);
-        }
+        sendFourOhFourOrError(resp, err);
     });
 });
 
@@ -134,147 +140,159 @@ app.put('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated
     var recipe = req.body;
     recipe._id = req.params.id;
     
-    recipeServices.mergeUserChangeableProperties(recipe)
-    .then(function(recipeToSave) {
-        recipeServices.upsertRecipe(recipeToSave)
-        .then(function() {
-            return resp.send(recipeToSave);  
-        })
-        .catch(function(err) {
-            console.log(err.stack);
-            return resp.send(500);
-        });
+    recipeServices.updateRecipe(recipe)
+    .then(function(savedRecipe) {
+        return resp.send(savedRecipe);  
     })
     .catch(function(err) {
-        console.log(err.stack);
-        return resp.send(500);
+        sendError(resp, err);
     });
 })
 
+app.delete('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+    recipeServices.deleteRecipe(req.params.id)
+    .then(function() {
+        return resp.send({});  
+    })
+    .catch(function(err) {
+        sendFourOhFourOrError(resp, err);
+    });   
+});
+
 app.post('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+    var body = req.body;
     
+    var promise;
     switch (req.query.action) {
         case "rename":
-            recipeServices.handleRenameRecipe(req, resp);
+            promise = recipeServices.renameRecipe(body);
             break;
         case "new":
-            recipeServices.handleNewRecipe(req, resp);
+            promise = recipeServices.newRecipe(body);
             break;
     }
+
+    promise
+    .then(function(savedRecipe) {
+        return resp.send(savedRecipe);  
+    })
+    .catch(function(err) {
+        sendError(resp, err);
+    });
+
 });
 
 app.post('/api/recipes/:id/likes', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
-    app.databases.recipes.findOne({_id:  req.params.id}, function(err, recipe) {
-        if (recipe){
-            var request = req.body;
-            switch (request.action) {
-                case "like":
-                    recipe.rating.likes = recipe.rating.likes +1;
-                break;
-                case "dislike":
-                    recipe.rating.likes = recipe.rating.likes -1;
-                break;
-            }
-            
-            app.databases.recipes.save(recipe, function(err){
-                if(!err){
-                   resp.send(JSON.stringify({}));
-                }
-                else {
-                    resp.send(409);
-                }
-            });
+    recipeServices.getRecipe(req.params.id)
+    .then(function(recipe) {
+        var request = req.body;
+        switch (request.action) {
+            case "like":
+                recipe.rating.likes = recipe.rating.likes +1;
+            break;
+            case "dislike":
+                recipe.rating.likes = recipe.rating.likes -1;
+            break;
         }
-        else{
-            resp.send(404);
-        }
-    });
+        
+        recipeServices.upsertRecipe(recipe)
+        .then(function() {
+            resp.send(recipe.rating);
+        })
+        .catch(function(err) {
+            sendError(resp, err);
+        });
+    })
+    .catch(function(err) {
+        sendError(resp, err);
+    });    
 });
 
 
 app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
-    app.databases.recipes.findOne({_id:  req.params.id}, function(err, recipe) {
-        if (recipe){
-            var files = req.files;
-            var picturesToInsert = [];
-            var rawPictures = [];
+    var files = req.files;
+    var picturesToInsert = [];
+    var rawPictures = [];
 
-            for(var key in files){
-                var file = files[key]; 
-                var newFileName = guid() + ".jpg";
+    for(var key in files){
+        var file = files[key],
+            targetFileName = shortid.generate() + ".jpg";
 
-                picturesToInsert.push({
-                                        "file": newFileName,
-                                        "user_name": req.user.email,
-                                     });                
+        picturesToInsert.push({
+            file: targetFileName,
+            user_name: req.user.email,
+        });                
 
-                rawPictures.push({
-                                    "localPath": file, 
-                                    "newFileName": newFileName
-                                });
-            }
-                
-            var convertedCount = 0;
-            for (var index = 0; index < rawPictures.length; ++index) {
-                (function(index){
-                    var newFilePath = config.pictures.directory + "//" +  rawPictures[index].newFileName;
-                    var newThumbnailPath = config.pictures.directory + "//thumbnails//" +  rawPictures[index].newFileName;
-
-                    gm(rawPictures[index].localPath.path)
-                        .resize(2048)
-                        .quality(45)
-                        .autoOrient()
-                        .write(newFilePath, function (err) {
-                            if (err){
-                                console.error(err);
-                                resp.send(500);
-                            }
-                            else {
-                                fs.unlink(rawPictures[index].localPath.path);                                
-                                gm(newFilePath)
-                                    .resize(150)
-                                    .write(newThumbnailPath, function (err) {
-                                        if(!err){
-                                            delete rawPictures[index].localPath;
-                                            convertedCount++;
-                                
-                                            if(convertedCount === rawPictures.length) {
-                                                recipe.pictures=recipe.pictures||[];
-                                                recipe.pictures = recipe.pictures.concat(picturesToInsert);
-
-                                                app.databases.recipes.save(recipe, function(err){
-                                                    if(!err){
-                                                        resp.send(picturesToInsert);
-                                                    }
-                                                    else{
-                                                        resp.send(409);
-                                                    }
-                                                });
-                                            }
-                                        }
-                                        else{
-                                            console.error(err);
-                                            resp.send(500);
-                                        }
-                                    });
-                            }
-                        });   
-                })(index);
-            }                                      
-        }
-        else{
-            resp.send(404);
-        }
-    });
-});
-
-function guid() {
-    function _p8(s) {
-        var p = (Math.random().toString(16)+"000000000").substr(2,8);
-        return s ? "-" + p.substr(0,4) + "-" + p.substr(4,4) : p ;
+        rawPictures.push({
+            localPath: file, 
+            targetFileName: targetFileName
+        });
     }
-    return _p8() + _p8(true) + _p8(true) + _p8();
-}    
+
+    var promise = new Promise(function(resolve, reject) {
+        var pictureConvertPromises = rawPictures.map(generatePicAndThumb);
+        Promise.all(pictureConvertPromises)
+        .then(function() {
+            recipeServices.getRecipe(req.params.id)
+            .then(function(recipe) {
+                recipe.pictures = recipe.pictures || [];
+                recipe.pictures = recipe.pictures.concat(picturesToInsert);
+
+                recipeServices.upsertRecipe(recipe)
+                .then(resolve)
+                .catch(reject);
+            })
+            .catch(reject);
+        })
+        .catch(reject);
+    });
+
+    promise
+    .then(function(recipe) {
+        unlinkFiles(files);
+        resp.send(recipe);
+    })
+    .catch(function(err) {
+        unlinkFiles(files);
+        sendFourOhFourOrError(resp, err);
+    });  
+
+    function unlinkFiles(files) {
+        for (var key in files) {
+            var file = files[key];
+            fs.unlink(file.path);            
+        };
+    }
+
+    function generatePicAndThumb(rawPicture) {
+        return new Promise(function(resolve, reject) {
+            var targetPath = config.pictures.directory + "/" +  rawPicture.targetFileName;
+            var thumbnailPath = config.pictures.directory + "/thumbnails/" +  rawPicture.targetFileName;
+
+            gm(rawPicture.localPath.path)
+            .resize(2048)
+            .quality(45)
+            .autoOrient()
+            .write(targetPath, function (err) {
+                if (err){
+                    return reject(err);
+                }
+                else {
+                    gm(targetPath)
+                    .resize(150)
+                    .write(thumbnailPath, function (err) {
+                        if(!err){
+                            return resolve(targetPath);
+                        }
+                        else{
+                            return reject(err);
+                        }
+                    });
+                }
+            });
+        });
+    }
+});
 
 app.use(cacheControl.cachingStatic);
 app.use("/pics", express.static(config.pictures.directory));
@@ -284,7 +302,19 @@ app.listen(config.server.port, config.server.ip);
 console.log('Listening on port ' + config.server.port);
 
 
+function sendError(resp, err) {
+    console.log(err.stack);
+    return resp.send(500);
+}
 
+function sendFourOhFourOrError(resp, err) {
+    if (err.status === 404) {
+        return resp.send(404);
+    }
+    else {
+        sendError(resp, err);
+    }    
+}
 
 
     
