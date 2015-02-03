@@ -19,16 +19,8 @@ function doCache(req, resp, next) {
     next();
 }    
 
-var baseStatic = express.static(__dirname + '/../ui/');
-function cachingStatic(req, resp, next) {
-    doCache(req, resp, function() {
-        baseStatic(req, resp, next);
-    });
-}
-
 module.exports = {
     dontCache: dontCache,
     dontCacheIfNoOtherPolicyPresent: dontCacheIfNoOtherPolicyPresent,
-    doCache: doCache,
-    cachingStatic: cachingStatic
+    doCache: doCache
 }

@@ -10,7 +10,8 @@ var express = require('express'),
     config = require('../config/cookie-config.js'),
     elasticsearch = require("elasticsearch"),
     flash = require('connect-flash'),
-    ck = require('./ck'),
+    ck = require('./ck.js'),
+    imaging = require("./imaging.js"),
     cacheControl = require('./cache-control'),
     recipeServices = require('./recipe-services'),
     security = require('./security'),
@@ -18,6 +19,8 @@ var express = require('express'),
     fs = require('fs'),
     gm = require('gm');
 
+
+console.log(JSON.stringify(config, ' '));
 
 app.use(sessions({
   cookieName: 'session',
@@ -84,6 +87,20 @@ app.get('/api/upgradeAllRecipes', cacheControl.dontCache, function(req, resp) {
 });
 */
 
+/*
+recipeServices.getRecipe("All-American-Burger")
+.then(function(recipe) {
+    ck.getPics(recipe)
+    .then(function() {
+        console.log("done!")
+    })
+    .catch(function(err) {
+        console.log("fail: " + err.stack);
+    })
+
+})
+*/
+
 app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
     ck.getRecipe(req.params.id, function(err, recipe) {
@@ -92,8 +109,17 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated
             return;
         }
         
-        recipeServices.newRecipe(recipe)
+        recipeServices.setUniqueId(recipe)
+        .then(recipeServices.upsertRecipe)
         .then(function(insertedRecipe) {
+            ck.getPics(insertedRecipe)
+            .then(function() {
+                console.log("getPics for recipe " + insertedRecipe._id + " done!");
+            })
+            .catch(function(err) {
+                console.log("getPics for recipe " + insertedRecipe._id + " failed: " + err.stack);
+            })
+
             return resp.send(insertedRecipe);
         })
         .catch(function(err) {
@@ -230,7 +256,7 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
     }
 
     var promise = new Promise(function(resolve, reject) {
-        var pictureConvertPromises = rawPictures.map(generatePicAndThumb);
+        var pictureConvertPromises = rawPictures.map(imaging.generatePicAndThumb);
         Promise.all(pictureConvertPromises)
         .then(function() {
             recipeServices.getRecipe(req.params.id)
@@ -260,43 +286,20 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
     function unlinkFiles(files) {
         for (var key in files) {
             var file = files[key];
-            fs.unlink(file.path);            
+            if (fs.existsSync(file.path))
+                fs.unlinkSync(file.path);            
         };
     }
 
-    function generatePicAndThumb(rawPicture) {
-        return new Promise(function(resolve, reject) {
-            var targetPath = config.pictures.directory + "/" +  rawPicture.targetFileName;
-            var thumbnailPath = config.pictures.directory + "/thumbnails/" +  rawPicture.targetFileName;
 
-            gm(rawPicture.localPath.path)
-            .resize(2048)
-            .quality(45)
-            .autoOrient()
-            .write(targetPath, function (err) {
-                if (err){
-                    return reject(err);
-                }
-                else {
-                    gm(targetPath)
-                    .resize(150)
-                    .write(thumbnailPath, function (err) {
-                        if(!err){
-                            return resolve(targetPath);
-                        }
-                        else{
-                            return reject(err);
-                        }
-                    });
-                }
-            });
-        });
-    }
 });
 
-app.use(cacheControl.cachingStatic);
-app.use("/pics", express.static(config.pictures.directory));
-
+app.use(express.static(__dirname + '/../ui/'));
+app.use("/pics", function(req, resp, next) {
+    cacheControl.doCache(req, resp, function() {
+        express.static(config.pictures.directory)(req, resp, next);
+    })
+});
 
 app.listen(config.server.port, config.server.ip);
 console.log('Listening on port ' + config.server.port);

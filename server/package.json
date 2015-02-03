@@ -16,6 +16,7 @@
         "connect-flash": "*",
         "client-sessions": "*",
         "shortid": "*",
+        "request": "*",
         "gm": "*"
     }
 }

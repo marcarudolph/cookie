@@ -13,7 +13,7 @@ var db = new elasticsearch.Client({
 //  log: 'trace'
 });
 
-var headers = { 'Cookie': 'session=KvpPvALajxwP0aTs4WUQTg.s5HXAjZDFzBw-YGFKYVi_Klc5l3Wtiq-jDSdnIcWpNCRC515g2IidAzCaPnPbU_0vTmE1KWXL7c2ASGtspo-Om8JOVFOm5VtRudTDTWAleyyMx3isdGnF2j9jBcGHF189rD-2KlMjXuZ7cwAWzG1TJxuyVmFloqkcNWUyrTtFj0.1422377428978.1209600000.uD43_hqvylcQVkendoDFe2vl0on7egEO-7AVj6eZimk'};
+var headers = { 'Cookie': 'session=wsQI5FdB4w6OtRGOnQxJ7g.QwaNtVhrDuQ8hXpbcv9sVSmWKhLR68UPlGnLEztQgm4Hs6t0JpH20xCNk9jidQNnpHhl5ep4qs9GNKyi43kOcun9npHeO9dTnuL7-Y_Cri3PbTu5oCN5vrQoOvuWXtsfD_g6oHeZicxdOjgfmbdL-lLK40ucNz0Ai43-LrYPoxw.1422812437790.1209600000.M2-idwinta4G-bGJRkMRYfYHb9-c7Z6Yk9VG1w-Fev8'};
 
 getAllRecipes()
 .then(function(recipeInfos) {
