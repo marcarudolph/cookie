@@ -23,6 +23,11 @@ var config = {
     },
     pictures: {
         directory: picturesPath
+    },
+    auth: {
+        clientID: "629961806849-hm8g1af4pg4tp0kpcgaj2ghnliddpjep.apps.googleusercontent.com",
+        clientSecret: "QBS7duL9UyBpk-P6LXSRR9Xq",
+        realm: "cookie"
     }
 };
 

@@ -202,7 +202,10 @@ function getPics(recipe) {
         }
 
         var prom = downloadPage(recipe.origin.frontend_url);
-        recipe.pictures.forEach(function(pic) {
+        var picturesToDownload = recipe.pictures.filter(function(pic) {            
+            return pic.file && pic.file.indexOf("http") === 0;
+        });
+        picturesToDownload.forEach(function(pic) {
             prom = prom.then(function() {
                 var url = pic.file,
                     hash = require('crypto').createHash('md5').update(url).digest('hex'),
@@ -259,7 +262,7 @@ function getPics(recipe) {
             catch(uerr) {
                 console.log("unlinkDownloadedPics fail: " + uerr.stack);
             }
-            reject();
+            reject(err);
         });            
 
     });

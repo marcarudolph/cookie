@@ -14,6 +14,7 @@ grunt.initConfig({
     require("./elasticsearch/grunt.js")(grunt);
     require("./loadbalancer/grunt.js")(grunt);
     require("./mgmt/grunt.js")(grunt);
+    require("./server/grunt.js")(grunt);
 
-    grunt.registerTask('all', ['baseimage', 'basenode', 'elasticsearch', 'loadbalancer', 'mgmt']);
+    grunt.registerTask('all', ['baseimage', 'basenode', 'elasticsearch', 'loadbalancer', 'mgmt', 'server']);
 };

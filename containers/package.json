@@ -1,0 +1,11 @@
+{
+  "name": "aardvark-container-builds",
+  "version": "0.0.1",
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-exec": "*",
+    "grunt-run-grunt": "^0.1.4",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-sync": "0.0.8"
+  }
+}

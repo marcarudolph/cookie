@@ -1,16 +1,17 @@
 var config = require('../config/cookie-config.js'),
 	passport = require('passport'),
-    GoogleStrategy = require('passport-google').Strategy;
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 
 module.exports = {
     init: function(app) {
     	
-        function findUserById(identifier, done) {
+        function findUserById(id, done) {
+        	//console.log(JSON.stringify(profile, null, " "));
             app.database.get({
                 index: config.indexes.cookie,
                 type: "user",
-                id: identifier
+                id: id
             })
             .then(function(resp) {
             	var user = resp._source;
@@ -20,7 +21,7 @@ module.exports = {
             .catch(function(err) {
             	console.log(err);
                 if (err.status == 404)
-                    return done(null, false, { message: "No user with identifier " + identifier + " found"});
+                    return done(null, false, { message: "No user with id  " + id + " found"});
                 else
                     return done(err, null);
             });
@@ -41,20 +42,24 @@ module.exports = {
     		});
 		});
 
-		passport.use(new GoogleStrategy({
-		        returnURL: config.server.baseurl + '/auth/google/return',
-		        realm: config.server.baseurl
+		var google = new GoogleStrategy({
+			    clientID: config.auth.clientID,
+			    clientSecret: config.auth.clientSecret,
+		        callbackURL: config.server.baseurl + '/auth/google/return'
 		    },
-		    function (identifier, profile, done) {
-		    	findUserById(identifier, done);
+		    function (accessToken, refreshToken, profile, done) {
+		    	var id = profile._json.email;
+		    	findUserById(id, done);
 		    }
-		));		
+		);
+
+		passport.use(google);		
 
 		app.use(passport.initialize());
 		app.use(passport.session());
 
 		app.get('/auth/google', 
-		  passport.authenticate('google', { failureRedirect: '/#/signin', failureFlash: true }),
+		  passport.authenticate('google', { failureRedirect: '/#/signin', failureFlash: true, scope: ['https://www.googleapis.com/auth/userinfo.email'] }),
 		  function(req, res) {
 		    res.redirect('/');
 		  });

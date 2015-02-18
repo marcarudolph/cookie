@@ -1,5 +1,6 @@
 
 "use strict";
+global.config = require('../config/cookie-config.js');
 
 var express = require('express'),
     bodyParser = require('body-parser'),
@@ -7,7 +8,6 @@ var express = require('express'),
     sessions = require("client-sessions"),
     shortid = require("shortid"),
     Promise = require('es6-promise').Promise,
-    config = require('../config/cookie-config.js'),
     elasticsearch = require("elasticsearch"),
     flash = require('connect-flash'),
     ck = require('./ck.js'),
@@ -20,24 +20,24 @@ var express = require('express'),
     gm = require('gm');
 
 
-console.log(JSON.stringify(config, ' '));
+console.log(JSON.stringify(global.config, null, ' '));
 
 app.use(sessions({
   cookieName: 'session',
-  secret: config.session.secret,
+  secret: global.config.session.secret,
   duration: 14 * 24 * 60 * 60 * 1000
 }));    
 app.use(flash());
 app.use(bodyParser.json());
 
 app.use(multer({
-  dest: config.server.uploadTempPath,
+  dest: global.config.server.uploadTempPath,
   rename: function (fieldname, filename) {
     return filename.replace(/\W+/g, '-').toLowerCase() + Date.now()
   }
 }));
 
-app.database = new elasticsearch.Client(config.database);
+app.database = new elasticsearch.Client(global.config.database);
 
 security.init(app);
 recipeServices.init(app);
@@ -132,7 +132,7 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated
 app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
     app.database.search({
-        index: config.indexes.cookie,
+        index: global.config.indexes.cookie,
         type: "recipe",
         size: 1001,
         _source: ["title"]
@@ -297,12 +297,12 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
 app.use(express.static(__dirname + '/../ui/'));
 app.use("/pics", function(req, resp, next) {
     cacheControl.doCache(req, resp, function() {
-        express.static(config.pictures.directory)(req, resp, next);
+        express.static(global.config.pictures.directory)(req, resp, next);
     })
 });
 
-app.listen(config.server.port, config.server.ip);
-console.log('Listening on port ' + config.server.port);
+app.listen(global.config.server.port, global.config.server.ip);
+console.log('Listening on port ' + global.config.server.port);
 
 
 function sendError(resp, err) {

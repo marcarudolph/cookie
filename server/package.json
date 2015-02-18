@@ -1,22 +1,23 @@
 {
-    "name":"cookie-www",
-    "description":"cookie www server",
-    "version":"0.0.1",
-    "private":true,
-    "dependencies":{
-        "express": "*",
-        "body-parser": "*",
-        "multer": "*",
-        "async": "*",
-        "elasticsearch": "*",
-        "es6-promise": "*",
-        "atob": "*",
-        "passport": "*",
-        "passport-google": "*",
-        "connect-flash": "*",
-        "client-sessions": "*",
-        "shortid": "*",
-        "request": "*",
-        "gm": "*"
-    }
+  "name": "cookie-www",
+  "description": "cookie www server",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "async": "*",
+    "atob": "*",
+    "body-parser": "*",
+    "client-sessions": "*",
+    "connect-flash": "*",
+    "elasticsearch": "*",
+    "es6-promise": "*",
+    "express": "*",
+    "gm": "*",
+    "multer": "*",
+    "passport": "*",
+    "passport-google-oauth": "^0.1.5",
+    "passport-oauth": "^1.0.0",
+    "request": "*",
+    "shortid": "*"
+  }
 }
