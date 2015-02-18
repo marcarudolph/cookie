@@ -54,13 +54,13 @@ module.exports = function(grunt) {
         exec: {
             "server-build": {
                 cwd: 'server/build',
-                cmd: 'docker build -t server .'
+                cmd: 'docker build -t cookieserver .'
             },
             "server-tag": {
-                cmd: 'docker tag -f server registry.eztwo.com:5042/server'
+                cmd: 'docker tag -f server registry.eztwo.com:5042/cookieserver'
             },
             "server-push": {
-                cmd: 'docker push registry.eztwo.com:5042/server'
+                cmd: 'docker push registry.eztwo.com:5042/cookieserver'
             }
         }
     });
