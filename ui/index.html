@@ -18,13 +18,19 @@
         <script src="js/error-ctrl.js"></script>
         <script src="js/app.js"></script>
         <style>
+            a {
+                color: #3c763d;
+            }
+
             .ng-dirty.ng-invalid {
                 border:1px solid Red;
             }
+
             .btn-file {
                 position: relative;
                 overflow: hidden;
             }
+
             .btn-file input[type=file] {
                 position: absolute;
                 top: 0;
@@ -39,6 +45,55 @@
                 background: white;
                 cursor: inherit;
                 display: block;
+            }
+
+
+            .recipe-list {
+                padding-left: 0px;
+            }
+
+            .recipe-list li {
+                border-top: 1px solid #dff0d8;
+
+                display: block;
+            }
+
+            .recipe-list .clickable-content {
+                height: 80px;
+                padding-top: 10px;
+                padding-bottom: 10px;
+
+                padding-left: 10px;
+
+                clear: both;
+                
+            }
+
+            .recipe-list li:hover {
+                background-color: #f4f4f4;
+            }
+
+            .recipe-list .recipe-description {
+                height: 60px;
+                margin-left: 10px; 
+                float: left;    
+            }
+
+            .recipe-list .recipe-title {
+                font-weight: bold;
+                font-size: 1em;            
+            }
+            .recipe-list .recipe-subtitle {
+                font-size: 0.8em;            
+            }
+
+            .recipe-list .recipe-title-image {
+                width: 100px; 
+                height: 60px; 
+                display: inline-block;
+                background: no-repeat center center;
+                background-size: cover;
+                float: left;
             }
         </style>
         <!-- <script src="js/filters.js"></script>

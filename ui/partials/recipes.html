@@ -8,9 +8,19 @@
     <div class="h5">
         Suche: <input ng-model="query">
     </div>
-    <ul>
-        <li ng-repeat="recipe in recipes | filter:query | orderBy:orderBy">
-            <a href="#/recipes/{{recipe._id}}">{{recipe.title}}</a>
+    <ul class="recipe-list">
+        <li ng-repeat="recipe in recipes | filter:query | orderBy:orderBy track by recipe._id">
+            <a href="#/recipes/{{recipe._id}}">
+                <div class="clickable-content">
+                    <div ng-if="recipe.titlePicture.file" class="recipe-title-image" style="background-image:url(pics/thumbnails/{{recipe.titlePicture.file}})">&nbsp;</div>
+                    <div ng-if="!recipe.titlePicture.file" class="recipe-title-image">&nbsp;</div>
+                    <div class="recipe-description">
+                        <span class="recipe-title">{{recipe.title}}</span><br>
+                        <span class="recipe-subtitle">{{recipe.subtitle}}</span>
+                    </div>
+                </div>
+
+            </a>
         </li>
     </ul>
     

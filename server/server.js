@@ -135,11 +135,15 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
         index: global.config.indexes.cookie,
         type: "recipe",
         size: 1001,
-        _source: ["title"]
+        _source: ["title", "subtitle", "pictures"]
     })
     .then(function(results) {
         var recipes = results.hits.hits.map(function(hit) {
             hit._source._id = hit._id;
+            hit._source.titlePicture = null;
+            if (hit._source.pictures && hit._source.pictures.length > 0)
+                hit._source.titlePicture = hit._source.pictures[0];
+            hit._source.pictures = undefined;
             return hit._source;
         });
         return resp.send(recipes);

@@ -57,7 +57,7 @@ module.exports = function(grunt) {
                 cmd: 'docker build -t cookieserver .'
             },
             "server-tag": {
-                cmd: 'docker tag -f server registry.eztwo.com:5042/cookieserver'
+                cmd: 'docker tag -f cookieserver registry.eztwo.com:5042/cookieserver'
             },
             "server-push": {
                 cmd: 'docker push registry.eztwo.com:5042/cookieserver'
