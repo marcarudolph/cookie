@@ -165,6 +165,22 @@ app.get('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated
     });
 });
 
+app.post('/api/recipes/:id/getpics', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+    recipeServices.getRecipe(req.params.id)
+    .then(function(recipe) {
+        ck.getPics(recipe)
+        .then(function() {
+            resp.send("done!")
+        })
+        .catch(function(err) {
+            resp.status(500).send("fail: " + err.stack);
+        })
+    })
+    .catch(function(err) {
+        sendFourOhFourOrError(resp, err);
+    });
+});
+
 app.put('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
     var recipe = req.body;
