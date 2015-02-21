@@ -275,7 +275,7 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
             recipeServices.getRecipe(req.params.id)
             .then(function(recipe) {
                 recipe.pictures = recipe.pictures || [];
-                recipe.pictures = recipe.pictures.concat(picturesToInsert);
+                recipe.pictures = picturesToInsert.concat(recipe.pictures);
 
                 recipeServices.upsertRecipe(recipe)
                 .then(resolve)
