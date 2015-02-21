@@ -21,6 +21,10 @@ function RecipesCtrl($scope, Page) {
             window.location.href = "/#/recipes/" + newRecipe._id;
         });
     };
+
+    $scope.filterByTag = function(tag) {
+        $scope.query = tag;
+    }
 }
 
 //RecipesCtrl.$inject = ['$scope', Page];

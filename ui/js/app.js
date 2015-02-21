@@ -2,7 +2,7 @@
 
 /* App Module */
 
-var app = angular.module('cookie', ['angularFileUpload']).
+var app = angular.module('cookie', ['angularFileUpload', 'ngRoute']).
 config(['$routeProvider', function($routeProvider) {
     $routeProvider.
     when('/', {
@@ -93,6 +93,8 @@ app.factory('Page', function() {
         }
     };
 });
+
+app.controller('PageCtrl', PageCtrl);
 
 function PageCtrl($scope, Page) {
     

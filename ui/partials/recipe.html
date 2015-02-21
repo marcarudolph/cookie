@@ -1,6 +1,8 @@
 <div ng-if="!edit">
     <div class="h3">
-        <span class="glyphicon glyphicon-pencil" ng-click="beginEdit()"></span>
+        <a href="#/"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        &nbsp;
+        <span class="glyphicon glyphicon-pencil clickable" ng-click="beginEdit()"></span>
     </div>
     <div class="h1">
         {{displayCopy.title}}
@@ -8,10 +10,17 @@
     <div class="h4">
         <div style="float:left">{{displayCopy.subtitle}}</div>
         <div style="float:right">
-            <span class="glyphicon glyphicon-thumbs-up" title="{{displayCopy.rating.likes}}" ng-click="addLikeToRecipe();"></span>
-            <span class="glyphicon glyphicon-thumbs-down" title="{{displayCopy.rating.likes}}" ng-click="removeLikeFromRecipe();"></span>
+            <span class="glyphicon glyphicon-thumbs-up clickable" title="{{displayCopy.rating.likes}}" ng-click="addLikeToRecipe();"></span>
+            <span class="glyphicon glyphicon-thumbs-down clickable" title="{{displayCopy.rating.likes}}" ng-click="removeLikeFromRecipe();"></span>
         </div>
         <div style="clear:both"></div>
+
+    </div>
+    <div class="recipe-tags">
+        <span ng-repeat="tag in displayCopy.tags track by tag" class="tag label label-default">{{tag}}</span>
+    </div>
+    <div class="h4">
+        <br>
     </div>
 
     <div class="row" >
@@ -50,8 +59,8 @@
 
 <div ng-if="edit">
     <div class="h3">
-        <span class="glyphicon glyphicon-ok" ng-click="saveRecipe();" ></span>
-        <span class="glyphicon glyphicon-remove" ng-click="cancelEdit();" ></span>
+        <span class="glyphicon glyphicon-ok clickable" ng-click="saveRecipe();" ></span>
+        <span class="glyphicon glyphicon-remove clickable" ng-click="cancelEdit();" ></span>
     </div>
     <div class="h1">
         <input type="text" ng-model="recipe.title" placeholder="Titel eingeben"></input>
@@ -67,11 +76,11 @@
                     <li ng-repeat="line in recipe.instructions track by $index">
                         <div>
                             <textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
-                            <div class="glyphicon glyphicon-remove" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
+                            <div class="glyphicon glyphicon-remove clickable" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
                         </div>
                     </li>
                 </ol>
-                <div class="glyphicon glyphicon-plus" ng-click="addInstructionToRecipe();"  ></div>
+                <div class="glyphicon glyphicon-plus clickable" ng-click="addInstructionToRecipe();"  ></div>
             </div>
         </div>
         <div class="clearfix visible-xs"></div>
@@ -88,11 +97,11 @@
                             <input type="text" ng-model="ing.unit" style="width: 50px" placeholder="Einh."></input>
                             <input type="text" ng-model="ing.name" placeholder="Name"></input>
                             <input type="text" ng-model="ing.comment" placeholder="Kommentar" ng-keydown="handleIngredientTabKey($event, ing)"></input>   
-                            <div class="glyphicon glyphicon-remove" ng-click="deleteIngredient(ing);"></div>
+                            <div class="glyphicon glyphicon-remove clickable" ng-click="deleteIngredient(ing);"></div>
                         </article>
                     </li>
                 </ul>
-                <div class="glyphicon glyphicon-plus" ng-click="addIngredientToRecipe();"></div>
+                <div class="glyphicon glyphicon-plus clickable" ng-click="addIngredientToRecipe();"></div>
             </div>
         </div>
     </div>
