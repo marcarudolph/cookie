@@ -9,11 +9,11 @@ RUN apt-get install -y software-properties-common python-software-properties \
 	&& apt-get update \
 	&& apt-get install -y graphicsmagick
 
+WORKDIR /cookie/server
+
+CMD ["node", "/cookie/server/server.js"]
+
 ADD ./server/package.json /cookie/server/package.json
 RUN cd /cookie/server && npm install
 
 ADD . /cookie
-
-WORKDIR /cookie/server
-
-CMD ["node", "/cookie/server/server.js"]

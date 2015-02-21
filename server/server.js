@@ -170,10 +170,43 @@ app.post('/api/recipes/:id/getpics', cacheControl.dontCache, security.ensureAuth
     .then(function(recipe) {
         ck.getPics(recipe)
         .then(function() {
-            resp.send("done!")
+            return resp.send("done!")
         })
         .catch(function(err) {
-            resp.status(500).send("fail: " + err.stack);
+            return resp.status(500).send("fail: " + err.stack);
+        })
+    })
+    .catch(function(err) {
+        sendFourOhFourOrError(resp, err);
+    });
+});
+
+app.post('/api/recipes/:id/fillpics', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+    recipeServices.getRecipe(req.params.id)
+    .then(function(recipe) {
+        var parsedDataUrl = require('url').parse(recipe.origin.data_url, true);
+        var ckId = parsedDataUrl.query.ID;
+
+        ck.getRecipe(ckId, function(err, ckrecipe) {
+            if (err) {
+                return resp.send(err);
+            }
+
+            recipe.pictures = recipe.pictures.filter(function(p) { return p && p.file;});
+            recipe.pictures = recipe.pictures.concat(ckrecipe.pictures);
+            recipeServices.upsertRecipe(recipe)
+            .then(function() {
+                ck.getPics(recipe)
+                .then(function() {
+                    return resp.send("done!")
+                })
+                .catch(function(err) {
+                    return resp.status(500).send("fail: " + err.stack);
+                })                
+            })
+            .catch(function(err) {
+                return resp.status(500).send("fail: " + err.stack);
+            })                
         })
     })
     .catch(function(err) {
