@@ -5,8 +5,8 @@
             <a class="btn btn-default" href="#/recipes/"><span class="glyphicon glyphicon-plus"></span></a>
         </div>
     </div>
-    <div class="h5">
-        Suche: <input ng-model="query">
+    <div>
+        <input class="search-box" ng-model="query" placeholder="Suche...">
     </div>
     <ul class="recipe-list">
         <li ng-repeat="recipe in recipes | filter:query | orderBy:orderBy track by recipe._id">

@@ -59,48 +59,6 @@ app.get('/api/init', cacheControl.dontCache, function(req, resp) {
     resp.send(appData);
 });
 
-/*
-app.get('/api/upgradeAllRecipes', cacheControl.dontCache, function(req, resp) {
-       app.databases.recipes.find().toArray(function(err, docs) {
-            docs.map(function(recipe){
-                var changed = false;
-                
-                //V0 -> V1
-                if (recipe.ingedients) {
-                    changed = true;
-                    recipe.ingredients = recipe.ingedients;
-                    delete recipe.ingedients;
-                }                            
-                
-                if (changed) {
-                   app.databases.recipes.save(recipe, function(err) {
-                        if (err) {
-                            console.error("error while saving upgraded recipe '" + recipe._id + "': " + err);
-                            return;
-                       }
-                   });
-                }
-            });
-       });
-       
-       resp.send("upgrade running");
-});
-*/
-
-/*
-recipeServices.getRecipe("All-American-Burger")
-.then(function(recipe) {
-    ck.getPics(recipe)
-    .then(function() {
-        console.log("done!")
-    })
-    .catch(function(err) {
-        console.log("fail: " + err.stack);
-    })
-
-})
-*/
-
 app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
     ck.getRecipe(req.params.id, function(err, recipe) {
@@ -135,7 +93,7 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
         index: global.config.indexes.cookie,
         type: "recipe",
         size: 1001,
-        _source: ["title", "subtitle", "pictures"]
+        _source: ["title", "subtitle", "pictures", "tags"]
     })
     .then(function(results) {
         var recipes = results.hits.hits.map(function(hit) {
@@ -165,6 +123,7 @@ app.get('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated
     });
 });
 
+/*
 app.post('/api/recipes/:id/getpics', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     recipeServices.getRecipe(req.params.id)
     .then(function(recipe) {
@@ -213,6 +172,7 @@ app.post('/api/recipes/:id/fillpics', cacheControl.dontCache, security.ensureAut
         sendFourOhFourOrError(resp, err);
     });
 });
+*/
 
 app.put('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     

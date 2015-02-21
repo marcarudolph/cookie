@@ -18,6 +18,8 @@
         <script src="js/error-ctrl.js"></script>
         <script src="js/app.js"></script>
         <style>
+
+
             a {
                 color: #3c763d;
             }
@@ -47,6 +49,11 @@
                 display: block;
             }
 
+            .search-box {
+                margin: 10px;
+                width: 90%;
+                max-width: 400px;
+            }
 
             .recipe-list {
                 padding-left: 0px;
@@ -59,7 +66,7 @@
             }
 
             .recipe-list .clickable-content {
-                height: 80px;
+                min-height: 80px;
                 padding-top: 10px;
                 padding-bottom: 10px;
 
@@ -74,9 +81,7 @@
             }
 
             .recipe-list .recipe-description {
-                height: 60px;
-                margin-left: 10px; 
-                float: left;    
+                min-height: 60px;
             }
 
             .recipe-list .recipe-title {
@@ -84,7 +89,7 @@
                 font-size: 1em;            
             }
             .recipe-list .recipe-subtitle {
-                font-size: 0.8em;            
+                font-size: 0.8em;       
             }
 
             .recipe-list .recipe-title-image {
@@ -93,6 +98,7 @@
                 display: inline-block;
                 background: no-repeat center center;
                 background-size: cover;
+                margin-right: 10px;
                 float: left;
             }
         </style>
@@ -103,19 +109,15 @@
     <body>
         <div class="navbar">
             <a class="navbar-brand" href="#/">Cookie</a>
-            <ul class="nav navbar-nav">
-                <li class="active">
-                    <a href="#/">Home</a>
-                </li>
-            </ul>
-            <p class="navbar-text pull-right" ng-hide="!Page.authUser()">
-                <a href="#/auth" class="navbar-link">{{Page.authUser().name }}</a>
-            </p>
-            <p class="navbar-text pull-right" ng-hide="Page.authUser()">
+            <p class="navbar-text pull-right" ng-if="!Page.authUser()">
                 <a href="#/auth" class="navbar-link">Sign in</a>
             </p>
         </div>
         <div class="container" ng-view></div>
+        <div class="navbar-text pull-right" ng-if="Page.authUser()">
+            <a href="#/auth" class="navbar-link">{{Page.authUser().name }}</a>
+        </div>
+
     </body>
 
 </html>
