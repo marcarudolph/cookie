@@ -247,7 +247,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload) {
         });
     };
     
-    if (id)
+    if (id !== "_new")
         loadRecipe(id);
     else
         createNewRecipe();
