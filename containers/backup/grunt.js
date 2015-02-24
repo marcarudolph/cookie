@@ -5,7 +5,8 @@ module.exports = function(grunt) {
                 files: [{
                   cwd: 'backup',
                   src: [
-                    'Dockerfile'
+                    'Dockerfile',
+                    'backup.sh'
                   ],
                   dest: 'backup/build'
                 }],
