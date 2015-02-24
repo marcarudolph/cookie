@@ -37,6 +37,7 @@ module.directive('tagedit',['$http',function($http){
             }
 
             scope.addToSelectedTags=function(index){
+            	scope.selectedTags = scope.selectedTags || [];
                 if(scope.selectedTags.indexOf(scope.suggestions[index])===-1){
                     scope.selectedTags.push(scope.suggestions[index]);
                     scope.searchText='';
