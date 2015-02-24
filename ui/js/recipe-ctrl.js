@@ -216,7 +216,10 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
                 var matchingTags = tags.filter(function(t) { 
                     return t.tag.toLowerCase().indexOf(query) === 0;}
                 );
-                var tagsForControl = matchingTags.map(function(t) { return t.tag; });
+                var tagsForControl = matchingTags.map(function(t) {
+                    var tag = t.tag;
+                    return tag.charAt(0).toUpperCase() + tag.slice(1); 
+                });
                 return resolve(tagsForControl);
             })
             .catch(reject);
