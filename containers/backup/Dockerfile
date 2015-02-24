@@ -10,7 +10,7 @@ RUN chmod +x /usr/local/bin/dropbox_uploader.sh
 VOLUME /cfg
 VOLUME /cookie/pics
 VOLUME /cookie/backup
-CMD ["backup.sh"]
+CMD ["/bin/bash", "-c", "/usr/local/bin/backup.sh"]
 
 ADD ./backup.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/backup.sh
