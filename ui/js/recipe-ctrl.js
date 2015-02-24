@@ -1,6 +1,6 @@
 'use strict';
 
-function RecipeCtrl($scope, $routeParams, Page, $upload) {
+function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
 
     var id = $routeParams.recipeId;
     $scope.recipe = {};
@@ -168,14 +168,15 @@ function RecipeCtrl($scope, $routeParams, Page, $upload) {
     
     $scope.beginEdit = function () {
         $scope.recipeBackup = JSON.parse(JSON.stringify($scope.recipe));
-        $scope.edit = true;    
+        $scope.edit = true;
+        $scope.tagFetcher = $scope.tagFetcher || $http.get("/api/tags")
+
     };
     
     $scope.cancelEdit = function () {
         $scope.recipe = $scope.recipeBackup;
         $scope.edit = false;    
     };
-
     
     $scope.saveRecipe = function () {
         if (!$scope.recipe._id) {
@@ -204,6 +205,23 @@ function RecipeCtrl($scope, $routeParams, Page, $upload) {
             window.location.href = "/#/recipes/" +  response._id;
         });        
     };
+
+    $scope.tagFetcher = null;
+    $scope.getTags = function(query) {
+        query = query.toLowerCase();
+        return $q(function(resolve, reject) {
+            $scope.tagFetcher
+            .then(function(response) {
+                var tags = response.data;
+                var matchingTags = tags.filter(function(t) { 
+                    return t.tag.toLowerCase().indexOf(query) === 0;}
+                );
+                var tagsForControl = matchingTags.map(function(t) { return t.tag; });
+                return resolve(tagsForControl);
+            })
+            .catch(reject);
+        });
+    }  
     
     function renameAndSaveRecipeToServer(recipe){
         $.ajax({
@@ -253,5 +271,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload) {
         createNewRecipe();
     
 }
+
+
 
 //RecipeCtrl.$inject = ['$scope', $routeParams, Page, $upload];

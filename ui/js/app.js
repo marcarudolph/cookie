@@ -2,7 +2,7 @@
 
 /* App Module */
 
-var app = angular.module('cookie', ['angularFileUpload', 'ngRoute']).
+var app = angular.module('cookie', ['angularFileUpload', 'ngRoute', 'tagedit']).
 config(['$routeProvider', function($routeProvider) {
     $routeProvider.
     when('/', {

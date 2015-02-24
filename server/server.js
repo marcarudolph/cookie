@@ -307,6 +307,16 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
 
 });
 
+app.get("/api/tags", cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+    recipeServices.getTags()
+    .then(function(tags) {
+        resp.send(tags);
+    })
+    .catch(function(err) {
+        sendError(resp, err);
+    });  
+});
+
 app.use(express.static(__dirname + '/../ui/'));
 app.use("/pics", function(req, resp, next) {
     cacheControl.doCache(req, resp, function() {
@@ -320,7 +330,7 @@ console.log('Listening on port ' + global.config.server.port);
 
 function sendError(resp, err) {
     console.log(err.stack);
-    return resp.send(500);
+    return resp.status(500).send("");
 }
 
 function sendFourOhFourOrError(resp, err) {

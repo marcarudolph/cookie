@@ -62,32 +62,31 @@
         <span class="glyphicon glyphicon-ok clickable" ng-click="saveRecipe();" ></span>
         <span class="glyphicon glyphicon-remove clickable" ng-click="cancelEdit();" ></span>
     </div>
-    <div class="h1">
-        <input type="text" ng-model="recipe.title" placeholder="Titel eingeben"></input>
-    </div>
-    <div class="h4">
-        <input type="text" ng-model="recipe.subtitle" placeholder="Untertitel eingeben"></input>
-    </div>
-    <div class="row" >
-        <div class="col-xs-12 col-md-7">
-            <div class="panel panel-success">
-                <div class="panel-heading"><span class="h3">Zubereitung</span></div>
-                <ol>
-                    <li ng-repeat="line in recipe.instructions track by $index">
-                        <div>
-                            <textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
-                            <div class="glyphicon glyphicon-remove clickable" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
-                        </div>
-                    </li>
-                </ol>
-                <div class="glyphicon glyphicon-plus clickable" ng-click="addInstructionToRecipe();"  ></div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col-xs-12 col-md-10">
+            <div class="h1">
+                <input type="text" ng-model="recipe.title" placeholder="Titel eingeben" style="width: 100%"></input>
+            </div>
+            <div class="h4">
+                <input type="text" ng-model="recipe.subtitle" placeholder="Untertitel eingeben" style="width: 100%"></input>
             </div>
         </div>
-        <div class="clearfix visible-xs"></div>
-        <div class="col-xs-12 col-md-offset-1 col-md-4">
+    </div>
+    <div class="row" style="margin-top:10px;">
+        <div class="col-xs-12 col-md-10">
+            <div class="panel panel-success">
+                <div class="panel-heading"><span class="h3">Tags</span></div>
+                <div tagedit suggestions="getTags" model="recipe.tags" placeholder="'Tag hinzufügen'"></div>
+            </div>
+        </div>
+    </div> 
+
+   <div class="row" style="margin-top:10px;">
+        <div class="col-xs-12 col-md-10">
             <div class="panel panel-success">
                 <div class="panel-heading">
-                    <span class "h3">Berechnungsgrundlage:</span>
+                    <span class="h3">Zutaten</span>
+                    <span class="h5">Berechnungsgrundlage: </span>
                     <input style="width: 40px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/^([1-9][0-9]*)$/"></input>
                 </div>
                 <ul class="list-group">
@@ -102,6 +101,23 @@
                     </li>
                 </ul>
                 <div class="glyphicon glyphicon-plus clickable" ng-click="addIngredientToRecipe();"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:10px;">
+        <div class="col-xs-12 col-md-10">
+            <div class="panel panel-success">
+                <div class="panel-heading"><span class="h3">Zubereitung</span></div>
+                <ol>
+                    <li ng-repeat="line in recipe.instructions track by $index">
+                        <div>
+                            <textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
+                            <div class="glyphicon glyphicon-remove clickable" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="glyphicon glyphicon-plus clickable" ng-click="addInstructionToRecipe();"  ></div>
             </div>
         </div>
     </div>

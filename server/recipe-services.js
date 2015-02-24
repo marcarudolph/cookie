@@ -44,6 +44,7 @@ var recipeServices = {
                     newRecipe.instructions = recipe.instructions;
                     newRecipe.servings = recipe.servings;
                     newRecipe.ingredients = recipe.ingredients;
+                    newRecipe.tags = recipe.tags;
 
                     return resolve(newRecipe);
                 }
@@ -58,6 +59,7 @@ var recipeServices = {
                     mergedRecipe.instructions = recipe.instructions;
                     mergedRecipe.servings = recipe.servings;
                     mergedRecipe.ingredients = recipe.ingredients;
+                    mergedRecipe.tags = recipe.tags;
 
                     return resolve(mergedRecipe);
                 })
@@ -157,6 +159,37 @@ var recipeServices = {
                     }
                 });
             });
+        }
+
+        recipeServices.getTags = function() {
+            return new Promise(function(resolve, reject) {
+                app.database.search({
+                    index: config.indexes.cookie,
+                    type: "recipe",
+                    body: {
+                       size: 0, 
+                       aggregations: {
+                          taglist: {
+                             terms: {
+                                field: "tags",
+                                order: { "_term" : "asc" },
+                                size: 1000
+                             }
+                          }
+                       }
+                    }
+                })
+                .then(function(res) {
+                    var tags = res.aggregations.taglist.buckets.map(function(b) {
+                        return {
+                            tag: b.key,
+                            count: b.doc_count
+                        };
+                    });
+                    resolve(tags);
+                })
+                .catch(reject);
+            });            
         }
 
         function getIdFromRecipeTitle(title) {
