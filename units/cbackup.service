@@ -1,0 +1,21 @@
+[Unit]
+Description=Cookie Backup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=false
+ExecStartPre=-/usr/bin/docker rm -f %p
+ExecStartPre=-/usr/bin/docker pull registry.eztwo.com:5042/cookiebackup
+
+ExecStart=/bin/bash -c '\
+	/usr/bin/docker run \
+        --name=%p \
+        --add-host="es:$(/usr/serverconf/contnet ip es)" \
+		-v /usr/serverconf/backup/.dropbox_uploader:/cfg/.dropbox_uploader \
+		-v /usr/data/cookie/pics:/cookie/pics \
+		-v /usr/data/es/backup/cookie:/cookie/backup \
+        registry.eztwo.com:5042/cookiebackup'
+
+ExecStartPost=/usr/serverconf/contnet attach %p 192.168.42.70/24
