@@ -4,7 +4,7 @@ Requires=docker.service
 After=docker.service
 
 [Service]
-Type=oneshot
+Type=simple
 RemainAfterExit=false
 ExecStartPre=-/usr/bin/docker rm -f %p
 ExecStartPre=-/usr/bin/docker pull registry.eztwo.com:5042/cookiebackup
