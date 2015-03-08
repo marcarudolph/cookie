@@ -269,8 +269,18 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
     }
 
     var promise = new Promise(function(resolve, reject) {
-        var pictureConvertPromises = rawPictures.map(imaging.generatePicAndThumb);
-        Promise.all(pictureConvertPromises)
+        var convertPromise = null;
+        rawPictures.forEach(function(raw) {
+            if (convertPromise)
+                convertPromise = convertPromise.then(function () { return imaging.generatePicAndThumb(raw); });
+            else
+                convertPromise = imaging.generatePicAndThumb(raw);
+        });
+
+        if (!convertPromise)
+            return resolve();
+
+        convertPromise
         .then(function() {
             recipeServices.getRecipe(req.params.id)
             .then(function(recipe) {
