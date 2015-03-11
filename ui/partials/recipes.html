@@ -6,10 +6,11 @@
         </div>
     </div>
     <div>
-        <input class="search-box" ng-model="query" placeholder="Suche...">
+        <input class="search-box" ng-model="query" ng-model-options="{ debounce: 100 }" placeholder="Suche...">
+        <span class="clickable" ng-click="query = ''">X</span>
     </div>
     <ul class="recipe-list">
-        <li ng-repeat="recipe in recipes | filter:query | orderBy:orderBy track by recipe._id">
+        <li ng-repeat="recipe in recipes | orderBy:orderBy track by recipe._id">
             <a href="#/recipes/{{::recipe._id}}">
                 <div class="clickable-content">
                     <div ng-if="::recipe.titlePicture.file" class="recipe-title-image" style="background-image:url(pics/thumbnails/{{::recipe.titlePicture.file}})">&nbsp;</div>

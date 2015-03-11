@@ -89,11 +89,27 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated
 
 app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
+    var query = undefined;
+    if (req.query.q) {
+        var queryText = req.query.q.toLowerCase(),
+        query = { query: {
+            "query_string" : {
+                "fields" : ["title^3", "subtitle^2", "tags"],
+                "query" : queryText + "*",
+                "use_dis_max" : true
+            }
+        } };
+        //    query = { query: { match_phrase_prefix: { title: {query: queryText} } } };
+    }
+
+
     app.database.search({
         index: global.config.indexes.cookie,
         type: "recipe",
-        size: 1001,
-        _source: ["title", "subtitle", "pictures", "tags"]
+        size: 50,
+        _source: ["title", "subtitle", "pictures", "tags"],
+        body: query,
+//        q: "_all:" + req.query.q.toLowerCase()
     })
     .then(function(results) {
         var recipes = results.hits.hits.map(function(hit) {
