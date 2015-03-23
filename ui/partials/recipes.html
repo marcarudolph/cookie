@@ -1,4 +1,4 @@
-<div class="panel panel-success">
+<div class="panel panel-success" >
     <div class="panel-heading">
         <span class="h3">Rezepte</span>
         <div class="pull-right">
@@ -9,8 +9,8 @@
         <input class="search-box" ng-model="query" ng-model-options="{ debounce: 100 }" placeholder="Suche...">
         <span class="clickable" ng-click="query = ''">X</span>
     </div>
-    <ul class="recipe-list">
-        <li ng-repeat="recipe in recipes | orderBy:orderBy track by recipe._id">
+    <ul class="recipe-list" style="height: 600px; overflow-y: auto;" infinite-scroll="addAPage()" threshold="600" can-load="true">
+        <li ng-repeat="recipe in shownRecipes track by recipe._id">
             <a href="#/recipes/{{::recipe._id}}">
                 <div class="clickable-content">
                     <div ng-if="::recipe.titlePicture.file" class="recipe-title-image" style="background-image:url(pics/thumbnails/{{::recipe.titlePicture.file}})">&nbsp;</div>

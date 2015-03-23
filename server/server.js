@@ -2,7 +2,8 @@
 "use strict";
 global.config = require('../config/cookie-config.js');
 
-var express = require('express'),
+var fs = require('fs'),
+    express = require('express'),
     bodyParser = require('body-parser'),
     multer = require('multer'),
     sessions = require("client-sessions"),
@@ -15,9 +16,7 @@ var express = require('express'),
     cacheControl = require('./cache-control'),
     recipeServices = require('./recipe-services'),
     security = require('./security'),
-    app = express(),
-    fs = require('fs'),
-    gm = require('gm');
+    app = express();
 
 
 console.log(JSON.stringify(global.config, null, ' '));
@@ -92,13 +91,13 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
     var query = undefined;
     if (req.query.q) {
         var queryText = req.query.q.toLowerCase(),
-        query = { query: {
+        query = {
             "query_string" : {
                 "fields" : ["title^3", "subtitle^2", "tags"],
                 "query" : queryText + "*",
                 "use_dis_max" : true
             }
-        } };
+        };
         //    query = { query: { match_phrase_prefix: { title: {query: queryText} } } };
     }
 
@@ -106,9 +105,12 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
     app.database.search({
         index: global.config.indexes.cookie,
         type: "recipe",
-        size: 50,
+        size: 5000,
         _source: ["title", "subtitle", "pictures", "tags"],
-        body: query,
+        body: {
+            query: query,
+            sort: [{"title.raw": "asc"}]
+        },
 //        q: "_all:" + req.query.q.toLowerCase()
     })
     .then(function(results) {
