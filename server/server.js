@@ -109,7 +109,7 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
         _source: ["title", "subtitle", "pictures", "tags"],
         body: {
             query: query,
-            sort: [{"title.raw": "asc"}]
+            //sort: [{"title.raw": "asc"}]
         },
 //        q: "_all:" + req.query.q.toLowerCase()
     })
