@@ -88,7 +88,10 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated
 
 app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
-    var query = undefined;
+    var query = undefined,
+        from = parseInt(req.query.from) || 0,
+        size = parseInt(req.query.size) || 50;
+
     if (req.query.q) {
         var queryText = req.query.q.toLowerCase(),
         query = {
@@ -105,11 +108,12 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
     app.database.search({
         index: global.config.indexes.cookie,
         type: "recipe",
-        size: 5000,
+        from: from,
+        size: size,
         _source: ["title", "subtitle", "pictures", "tags"],
         body: {
             query: query,
-            //sort: [{"title.raw": "asc"}]
+            sort: [{"title.raw": "asc"}]
         },
 //        q: "_all:" + req.query.q.toLowerCase()
     })

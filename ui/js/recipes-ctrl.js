@@ -2,7 +2,7 @@
 
 var savedQuery = "";
 
-function RecipesCtrl($scope, Page) {
+function RecipesCtrl($scope, $http, Page) {
 
     Page.setTitle('Deine Rezepte');
 
@@ -10,15 +10,16 @@ function RecipesCtrl($scope, Page) {
     $scope.recipes = [];
     $scope.query = savedQuery;
     $scope.itemsToShow = 0;
-    $scope.shownRecipes = [];
+    $scope.hasMoreRecipes = true;
+    
+    var isPagePending = false;
 
     $scope.$watch('query', function() {
         savedQuery = $scope.query;
-        fetchList($scope.query);        
-    });
-
-    $scope.$watch('[recipes,itemsToShow]', function() {
-        $scope.shownRecipes = $scope.recipes.slice(0, $scope.itemsToShow);        
+        $scope.itemsToShow = 50;
+        $scope.hasMoreRecipes = true;
+        $scope.recipes = [];
+        fetchRecipes();
     });
 
     $scope.getFromCK = function() {
@@ -32,29 +33,33 @@ function RecipesCtrl($scope, Page) {
     }
 
     $scope.addAPage = function() {
-        $scope.itemsToShow += 10;
+        if (isPagePending)
+            return;
+
+        $scope.itemsToShow += 50;
+        fetchRecipes();
     }
 
-    function fetchList(query) {
-        var url = '/api/recipes/?q=' + query;
+
+    function fetchRecipes() {
+
+        isPagePending = true;
+        var neededSize = $scope.itemsToShow - $scope.recipes.length,
+            url = '/api/recipes/?q=' + $scope.query + "&from=" + $scope.recipes.length + "&size=" + neededSize;
+        if (neededSize <= 0)
+            return;
+
         $.getJSON(url).done(function (data) {
             $scope.$apply(function () {
-                data.sort(compareTitle);
-                $scope.recipes = data;
-                $scope.itemsToShow = 50;
+                isPagePending = false;
+                $scope.recipes = $scope.recipes.concat(data);
+                if (data.length < neededSize) {
+                    $scope.hasMoreRecipes = false;
+                }
             });
         }).fail(function(a, b, c) {
             console.error(a);
-        });
-
-        function compareTitle(a, b) {
-            var at = a.title.toLowerCase(),
-                bt = b.title.toLowerCase();
-
-            if (at < bt)  return -1;
-            if (at === bt)  return 0;
-            return 1;
-        }
+        });        
     }
 }
 
