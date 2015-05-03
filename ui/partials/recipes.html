@@ -6,7 +6,7 @@
         </div>
     </div>
     <div>
-        <input class="search-box" ng-model="query" ng-model-options="{ debounce: 100 }" placeholder="Suche...">
+        <input class="search-box" ng-model="query" ng-model-options="{ debounce: 200 }" placeholder="Suche...">
         <span class="clickable" ng-click="query = ''">X</span>
     </div>
     <ul class="recipe-list" style="height: 600px; overflow-y: auto;" infinite-scroll="addAPage()" threshold="100" can-load="hasMoreRecipes">
@@ -16,14 +16,14 @@
                     <div ng-if="::recipe.titlePicture.file" class="recipe-title-image" style="background-image:url(pics/thumbnails/{{::recipe.titlePicture.file}})">&nbsp;</div>
                     <div ng-if="::!recipe.titlePicture.file" class="recipe-title-image">&nbsp;</div>
                     <div class="recipe-description">
-                        <span class="recipe-title">{{::recipe.title}}</span><br>
-                        <span class="recipe-subtitle">{{::recipe.subtitle}}</span>
+                        <span class="recipe-title" markdown="recipe.title"></span><br>
+                        <span class="recipe-subtitle" markdown="recipe.subtitle"></span>
                     </div>
 
                 </div>
             </a>
             <div class="recipe-tags">
-                <span ng-repeat="tag in ::recipe.tags track by tag" class="tag label label-default" ng-click="filterByTag(tag);">{{::tag}}</span>
+                <span ng-repeat="tag in ::recipe.tags track by tag" class="tag label label-default" ng-click="filterByTag(tag);" markdown="::tag"></span>
             </div>
         </li>
     </ul>

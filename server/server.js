@@ -113,9 +113,16 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
         _source: ["title", "subtitle", "pictures", "tags"],
         body: {
             query: query,
-            sort: [{"title.raw": "asc"}]
-        },
-//        q: "_all:" + req.query.q.toLowerCase()
+            sort: [{"title.raw": "asc"}],
+            highlight : {
+                pre_tags: ["**"],
+                post_tags: ["**"],
+                fields : {
+                    title : {"type" : "fvh"},
+                    subtitle: {"type" : "fvh"}
+                }
+            }
+        }
     })
     .then(function(results) {
         var recipes = results.hits.hits.map(function(hit) {
@@ -124,6 +131,15 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
             if (hit._source.pictures && hit._source.pictures.length > 0)
                 hit._source.titlePicture = hit._source.pictures[0];
             hit._source.pictures = undefined;
+
+            if (hit.highlight) {
+                if (hit.highlight.title)
+                    hit._source.title = hit.highlight.title[0];
+
+                if (hit.highlight.subtitle)
+                    hit._source.subtitle = hit.highlight.subtitle[0];
+            }
+
             return hit._source;
         });
         return resp.send(recipes);

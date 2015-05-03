@@ -33,6 +33,9 @@ app.directive('markdown', function () {
             var markdown = scope[attrs.markdown];
 
             function safeTags(str) {
+                if (!str)
+                    return str;
+                
                 return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
             }
 
