@@ -2,7 +2,7 @@
 
 /* App Module */
 
-var app = angular.module('cookie', ['angularFileUpload', 'ngRoute', 'tagedit', 'infiniteScroll']).
+var app = angular.module('cookie', ['angularFileUpload', 'ngRoute', 'tagedit', 'infiniteScroll', 'QuickList']).
 config(['$routeProvider', function($routeProvider) {
     $routeProvider.
     when('/', {
@@ -35,7 +35,7 @@ app.directive('markdown', function () {
             function safeTags(str) {
                 if (!str)
                     return str;
-                
+
                 return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
             }
 
