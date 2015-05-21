@@ -36,10 +36,7 @@ security.init(app);
 recipeServices.init(app);
 
 
-app.use(security.ensureAuthenticated);
-
-
-app.get('/api/init', cacheControl.dontCache, function(req, resp) {
+app.get('/api/init', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
     var appData = {
 //        errors: req.flash('error')
@@ -56,7 +53,7 @@ app.get('/api/init', cacheControl.dontCache, function(req, resp) {
     resp.send(appData);
 });
 
-app.get('/api/fetchCK/:id', cacheControl.dontCache, function(req, resp) {
+app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
     ck.getRecipe(req.params.id, function(err, recipe) {
         if (err) {
@@ -84,7 +81,7 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, function(req, resp) {
     
 });
 
-app.get('/api/recipes/', cacheControl.dontCache, function(req, resp) {
+app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
     var query = undefined,
         from = parseInt(req.query.from) || 0,
@@ -143,7 +140,7 @@ app.get('/api/recipes/', cacheControl.dontCache, function(req, resp) {
 });
 
 
-app.get('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {    
+app.get('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {    
 
     recipeServices.getRecipe(req.params.id)
     .then(function(recipe) {
@@ -155,7 +152,7 @@ app.get('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {
 });
 
 
-app.put('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {
+app.put('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
     var recipe = req.body;
     recipe._id = req.params.id;
@@ -170,7 +167,7 @@ app.put('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {
 });
 
 
-app.delete('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {
+app.delete('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     recipeServices.deleteRecipe(req.params.id)
     .then(function() {
         return resp.send({});  
@@ -181,7 +178,7 @@ app.delete('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {
 });
 
 
-app.post('/api/recipes/', cacheControl.dontCache, function(req, resp) {
+app.post('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     var body = req.body;
     
     var promise;
@@ -205,7 +202,7 @@ app.post('/api/recipes/', cacheControl.dontCache, function(req, resp) {
 });
 
 
-app.post('/api/recipes/:id/likes', cacheControl.dontCache, function(req, resp) {
+app.post('/api/recipes/:id/likes', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     recipeServices.getRecipe(req.params.id)
     .then(function(recipe) {
         var request = req.body;
@@ -232,7 +229,7 @@ app.post('/api/recipes/:id/likes', cacheControl.dontCache, function(req, resp) {
 });
 
 
-app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, function(req, resp) {
+app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     var files = req.files;
     var picturesToInsert = [];
     var rawPictures = [];
@@ -302,7 +299,7 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, function(req, res
 });
 
 
-app.get("/api/tags", cacheControl.dontCache, function(req, resp) {
+app.get("/api/tags", cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     recipeServices.getTags()
     .then(function(tags) {
         resp.send(tags);
@@ -313,7 +310,7 @@ app.get("/api/tags", cacheControl.dontCache, function(req, resp) {
 });
 
 
-app.get('/api/admin/recipes/update', cacheControl.dontCache, function(req, resp) {
+app.get('/api/admin/recipes/update', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
 
     app.database.search({

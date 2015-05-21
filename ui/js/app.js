@@ -99,9 +99,10 @@ app.factory('Page', function() {
 
 app.controller('PageCtrl', PageCtrl);
 
-function PageCtrl($scope, Page) {
+function PageCtrl($scope, $http, Page) {
     
-    $.getJSON('/api/init').done(function (appData) {
+    $http.get('/api/init')
+    .success(function (appData) {
         if (appData.errors && appData.errors.length > 0) {
             app.errors = appData.errors;
             window.location.href="/#/error";
@@ -111,6 +112,14 @@ function PageCtrl($scope, Page) {
         }
         else {
             Page.setAuthUser(appData.user)
+        }
+    })
+    .error(function(data, status, headers, config) {
+        if (status === 401) {
+            window.location.href="/#/auth";        
+        }
+        else {
+            window.location.href="/#/error";            
         }
     });
     
