@@ -4,7 +4,7 @@ MAINTAINER Marc Rudolph <marc.a.rudolph@gmail.com>
 
 EXPOSE 8088
 
-RUN apk add --update graphicsmagick
+RUN apk add graphicsmagick --update-cache --repository http://dl-4.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
 
 WORKDIR /cookie/server
 
