@@ -4,10 +4,7 @@ MAINTAINER Marc Rudolph <marc.a.rudolph@gmail.com>
 
 EXPOSE 8088
 
-RUN apt-get install -y software-properties-common python-software-properties \
-	&& add-apt-repository -y ppa:dhor/myway \
-	&& apt-get update \
-	&& apt-get install -y graphicsmagick
+RUN apk add --update graphicsmagick
 
 WORKDIR /cookie/server
 
