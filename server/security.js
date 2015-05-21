@@ -1,7 +1,7 @@
 var config = require('../config/cookie-config.js'),
 	passport = require('passport'),
 	userCache = require('memory-cache'),
-    tokenAuth = require('./token-auth.js')({skipPathes: ['/auth/google', '/auth/google/return']});
+    tokenAuth = require('./token-auth.js')({skipPathes: ['/auth/google', '/auth/google/return', '/ui']});
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 
