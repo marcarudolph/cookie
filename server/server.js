@@ -5,12 +5,11 @@ global.config = require('../config/cookie-config.js');
 var fs = require('fs'),
     express = require('express'),
     bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser'),
     multer = require('multer'),
-    sessions = require("client-sessions"),
     shortid = require("shortid"),
     Promise = require('es6-promise').Promise,
     elasticsearch = require("elasticsearch"),
-    flash = require('connect-flash'),
     ck = require('./ck.js'),
     imaging = require("./imaging.js"),
     cacheControl = require('./cache-control'),
@@ -21,12 +20,7 @@ var fs = require('fs'),
 
 console.log(JSON.stringify(global.config, null, ' '));
 
-app.use(sessions({
-  cookieName: 'session',
-  secret: global.config.session.secret,
-  duration: 14 * 24 * 60 * 60 * 1000
-}));    
-app.use(flash());
+app.use(cookieParser());
 app.use(bodyParser.json());
 
 app.use(multer({
@@ -41,10 +35,14 @@ app.database = new elasticsearch.Client(global.config.database);
 security.init(app);
 recipeServices.init(app);
 
+
+app.use(security.ensureAuthenticated);
+
+
 app.get('/api/init', cacheControl.dontCache, function(req, resp) {
     
     var appData = {
-        errors: req.flash('error')
+//        errors: req.flash('error')
     };
     
     if (req.user) {
@@ -58,7 +56,7 @@ app.get('/api/init', cacheControl.dontCache, function(req, resp) {
     resp.send(appData);
 });
 
-app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+app.get('/api/fetchCK/:id', cacheControl.dontCache, function(req, resp) {
     
     ck.getRecipe(req.params.id, function(err, recipe) {
         if (err) {
@@ -86,7 +84,7 @@ app.get('/api/fetchCK/:id', cacheControl.dontCache, security.ensureAuthenticated
     
 });
 
-app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+app.get('/api/recipes/', cacheControl.dontCache, function(req, resp) {
     
     var query = undefined,
         from = parseInt(req.query.from) || 0,
@@ -101,7 +99,6 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
                 "use_dis_max" : true
             }
         };
-        //    query = { query: { match_phrase_prefix: { title: {query: queryText} } } };
     }
 
 
@@ -110,7 +107,7 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
         type: "recipe",
         from: from,
         size: size,
-        _source: ["title", "subtitle", "pictures", "tags"],
+        _source: ["title", "subtitle", "titlePicture", "tags"],
         body: {
             query: query,
             sort: [{"title.raw": "asc"}],
@@ -127,10 +124,6 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
     .then(function(results) {
         var recipes = results.hits.hits.map(function(hit) {
             hit._source._id = hit._id;
-            hit._source.titlePicture = null;
-            if (hit._source.pictures && hit._source.pictures.length > 0)
-                hit._source.titlePicture = hit._source.pictures[0];
-            hit._source.pictures = undefined;
 
             if (hit.highlight) {
                 if (hit.highlight.title)
@@ -150,7 +143,7 @@ app.get('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, f
 });
 
 
-app.get('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {    
+app.get('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {    
 
     recipeServices.getRecipe(req.params.id)
     .then(function(recipe) {
@@ -161,58 +154,8 @@ app.get('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated
     });
 });
 
-/*
-app.post('/api/recipes/:id/getpics', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
-    recipeServices.getRecipe(req.params.id)
-    .then(function(recipe) {
-        ck.getPics(recipe)
-        .then(function() {
-            return resp.send("done!")
-        })
-        .catch(function(err) {
-            return resp.status(500).send("fail: " + err.stack);
-        })
-    })
-    .catch(function(err) {
-        sendFourOhFourOrError(resp, err);
-    });
-});
 
-app.post('/api/recipes/:id/fillpics', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
-    recipeServices.getRecipe(req.params.id)
-    .then(function(recipe) {
-        var parsedDataUrl = require('url').parse(recipe.origin.data_url, true);
-        var ckId = parsedDataUrl.query.ID;
-
-        ck.getRecipe(ckId, function(err, ckrecipe) {
-            if (err) {
-                return resp.send(err);
-            }
-
-            recipe.pictures = recipe.pictures.filter(function(p) { return p && p.file;});
-            recipe.pictures = recipe.pictures.concat(ckrecipe.pictures);
-            recipeServices.upsertRecipe(recipe)
-            .then(function() {
-                ck.getPics(recipe)
-                .then(function() {
-                    return resp.send("done!")
-                })
-                .catch(function(err) {
-                    return resp.status(500).send("fail: " + err.stack);
-                })                
-            })
-            .catch(function(err) {
-                return resp.status(500).send("fail: " + err.stack);
-            })                
-        })
-    })
-    .catch(function(err) {
-        sendFourOhFourOrError(resp, err);
-    });
-});
-*/
-
-app.put('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+app.put('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {
     
     var recipe = req.body;
     recipe._id = req.params.id;
@@ -224,9 +167,10 @@ app.put('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated
     .catch(function(err) {
         sendError(resp, err);
     });
-})
+});
 
-app.delete('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+
+app.delete('/api/recipes/:id', cacheControl.dontCache, function(req, resp) {
     recipeServices.deleteRecipe(req.params.id)
     .then(function() {
         return resp.send({});  
@@ -236,7 +180,8 @@ app.delete('/api/recipes/:id', cacheControl.dontCache, security.ensureAuthentica
     });   
 });
 
-app.post('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+
+app.post('/api/recipes/', cacheControl.dontCache, function(req, resp) {
     var body = req.body;
     
     var promise;
@@ -259,7 +204,8 @@ app.post('/api/recipes/', cacheControl.dontCache, security.ensureAuthenticated, 
 
 });
 
-app.post('/api/recipes/:id/likes', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+
+app.post('/api/recipes/:id/likes', cacheControl.dontCache, function(req, resp) {
     recipeServices.getRecipe(req.params.id)
     .then(function(recipe) {
         var request = req.body;
@@ -286,7 +232,7 @@ app.post('/api/recipes/:id/likes', cacheControl.dontCache, security.ensureAuthen
 });
 
 
-app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, function(req, resp) {
     var files = req.files;
     var picturesToInsert = [];
     var rawPictures = [];
@@ -355,7 +301,8 @@ app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAu
 
 });
 
-app.get("/api/tags", cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+
+app.get("/api/tags", cacheControl.dontCache, function(req, resp) {
     recipeServices.getTags()
     .then(function(tags) {
         resp.send(tags);
@@ -363,6 +310,36 @@ app.get("/api/tags", cacheControl.dontCache, security.ensureAuthenticated, funct
     .catch(function(err) {
         sendError(resp, err);
     });  
+});
+
+
+app.get('/api/admin/recipes/update', cacheControl.dontCache, function(req, resp) {
+    
+
+    app.database.search({
+        index: global.config.indexes.cookie,
+        type: "recipe",
+        from: 0,
+        size: 10000,
+        _source: [],
+        body: {}
+        
+    })
+    .then(function(results) {
+        var recipePromises = results.hits.hits.map(function(hit) {
+            return recipeServices.getRecipe(hit._id);
+        });
+        Promise.all(recipePromises)
+        .then(function(recipes) {
+            var upsertPromises = recipes.map(function(recipe) {
+                return recipeServices.upsertRecipe(recipe);
+            });
+            Promise.all(recipePromises)
+            .then(function(recipes) {
+                res.status(201).send();
+            });
+        });
+    });
 });
 
 app.use(express.static(__dirname + '/../ui/'));
@@ -383,7 +360,7 @@ function sendError(resp, err) {
 
 function sendFourOhFourOrError(resp, err) {
     if (err.status === 404) {
-        return resp.send(404);
+        return resp.status(404).send("");
     }
     else {
         sendError(resp, err);
@@ -392,6 +369,8 @@ function sendFourOhFourOrError(resp, err) {
 
 
     
+
+
     
     
     

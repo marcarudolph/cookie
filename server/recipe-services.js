@@ -112,6 +112,9 @@ var recipeServices = {
 
                 body._id = undefined;
 
+                if (!body.titlePicture && body.pictures && body.pictures.length > 0 )
+                    body.titlePicture = body.pictures[0].file;
+
                 app.database.index({
                     index: config.indexes.cookie,
                     type: "recipe",

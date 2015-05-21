@@ -1,5 +1,7 @@
 var config = require('../config/cookie-config.js'),
 	passport = require('passport'),
+	userCache = require('memory-cache'),
+    tokenAuth = require('./token-auth.js')({skipPathes: ['/auth/google', '/auth/google/return']});
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 
@@ -7,7 +9,6 @@ module.exports = {
     init: function(app) {
     	
         function findUserById(id, done) {
-        	//console.log(JSON.stringify(profile, null, " "));
             app.database.get({
                 index: config.indexes.cookie,
                 type: "user",
@@ -56,17 +57,18 @@ module.exports = {
 		passport.use(google);		
 
 		app.use(passport.initialize());
-		app.use(passport.session());
 
 		app.get('/auth/google', 
-		  passport.authenticate('google', { failureRedirect: '/#/signin', failureFlash: true, scope: ['https://www.googleapis.com/auth/userinfo.email'] }),
+		  passport.authenticate('google', { failureRedirect: '/#/signin', failureFlash: false, scope: ['https://www.googleapis.com/auth/userinfo.email'] }),
 		  function(req, res) {
 		    res.redirect('/');
 		  });
 
 		app.get('/auth/google/return', 
-		  passport.authenticate('google', { failureRedirect: '/#/', failureFlash: true }),
+		  passport.authenticate('google', { failureRedirect: '/#/', failureFlash: false }),
 		  function(req, res) {
+		  	console.log("User:" + JSON.stringify(req.user));
+		  	appendTokenToResponse(req, res);
 		    res.redirect('/');
 		  });
 
@@ -75,12 +77,50 @@ module.exports = {
 		  res.redirect('/');
 		});
 	},
+
 	ensureAuthenticated: function(req, res, next) {
-	  if (req.isAuthenticated()) { 
-	  	next();
-	  }
-	  else {
-	  	res.status(401).send('Not authenticated');
-	  }
+
+		tokenAuth.checkAndGetAuthTokenData(req, res)	
+		.then(function() {
+			var isSkippedRoute = (!req.user);
+			if (isSkippedRoute)
+				return next();
+
+			next();
+			// loadUser(req.user)
+			// .then(function (fullUser) {
+			// 	req.user = fullUser;
+
+			// 	return next();
+			// })
+			// .catch(function (err) {
+			// 	errorHandling.formatAndLogError(err, "auth via token - load user")
+			// 	return res.sendStatus(401);
+			// });
+		})
+		.catch(function(err) {
+			console.log("auth via token - checkAndGetAuthTokenData failed with error " + err.stack);
+			return res.sendStatus(401);
+		});
 	}
 }
+
+function appendTokenToResponse(req, res) {
+
+	var token = generateTokenFromUser(req.user);
+
+	res.cookie(
+		"Authorization",
+		"Bearer " + token,
+		{
+			//secure: true
+		}
+	);	
+}
+
+function generateTokenFromUser(user) {
+	var tokenData = {tenant: user.tenant, _id: user._id};
+	return tokenAuth.generateToken(tokenData);
+}
+
+
