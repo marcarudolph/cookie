@@ -1,4 +1,4 @@
-FROM mhart/alpine-iojs:2.0
+FROM mhart/alpine-node:0.12
 
 MAINTAINER Marc Rudolph <marc.a.rudolph@gmail.com>
 
