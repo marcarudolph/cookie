@@ -3,14 +3,24 @@ FROM mhart/alpine-iojs:2.0
 MAINTAINER Marc Rudolph <marc.a.rudolph@gmail.com>
 
 EXPOSE 8088
-
-RUN apk add graphicsmagick --update-cache --repository http://dl-4.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
-
 WORKDIR /cookie/server
 
 CMD ["node", "/cookie/server/server.js"]
 
+# Build LWIP
+RUN apk add --update build-base python && \
+	mkdir -p /tmp/lwipbuild && \
+	cd /tmp/lwipbuild && \
+	npm install --production lwip && \
+	rm -rf npm* && \
+	rm -rf node_modules/lwip/src && \
+	rm -rf node_modules/lwip/tests && \
+	rm -rf node_modules/lwip/examples && \
+	apk del build-base python
+
 ADD ./server/package.json /cookie/server/package.json
-RUN cd /cookie/server && npm install
+RUN cd /cookie/server && \
+	mv /tmp/lwipbuild/node_modules ./ && \
+	npm install --production
 
 ADD . /cookie
