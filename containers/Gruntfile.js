@@ -7,6 +7,7 @@ grunt.initConfig({
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-sync');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-shell');
     grunt.loadNpmTasks('grunt-run-grunt');
 
     require("./baseimage/grunt.js")(grunt);
