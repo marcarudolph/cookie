@@ -51,21 +51,24 @@ module.exports = function(grunt) {
                 updateAndDelete: true
             }
         },
-        exec: {
+        shell: {
             "server-build": {
-                cwd: 'server/build',
-                cmd: 'docker build -t cookieserver .'
+                command: 'docker build -t cookieserver .',
+                execOptions: {
+                  cwd: 'server/build',
+                  maxBuffer: 1024*1024
+                }
             },
             "server-tag": {
-                cmd: 'docker tag -f cookieserver registry.eztwo.com:5042/cookieserver'
+                command: 'docker tag -f cookieserver registry.eztwo.com:5042/cookieserver'
             },
             "server-push": {
-                cmd: 'docker push registry.eztwo.com:5042/cookieserver'
+                command: 'docker push registry.eztwo.com:5042/cookieserver'
             }
         }
     });
     grunt.registerTask('server', [
         'sync:server-server', 'sync:server-ui', 'sync:server-config', 'sync:server-docker',
-        'exec:server-build', 'exec:server-tag', 'exec:server-push'
+        'shell:server-build', 'shell:server-tag', 'shell:server-push'
     ]);
 }
