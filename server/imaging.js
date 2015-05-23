@@ -2,7 +2,9 @@
 
 var Promise = require('es6-promise').Promise,
     config = require('../config/cookie-config.js'),
-    lwip = require('lwip');
+    sharp = require('sharp');
+
+sharp.concurrency(1);
 
 exports.generatePicAndThumb = function generatePicAndThumb(rawPicture) {
 
@@ -10,9 +12,9 @@ exports.generatePicAndThumb = function generatePicAndThumb(rawPicture) {
     var thumbnailPath = config.pictures.directory + "/thumbnails/" +  rawPicture.targetFileName;
 
     return new Promise(function(resolve, reject) {
-        resize(rawPicture.localPath.path, targetPath, 2048)
+        resize(rawPicture.localPath.path, targetPath, 2048, 40)
         .then(function() {
-            resize(targetPath, thumbnailPath, 150)
+            resize(targetPath, thumbnailPath, 300, 20)
             .then(resolve)
             .catch(reject);
         })
@@ -20,26 +22,17 @@ exports.generatePicAndThumb = function generatePicAndThumb(rawPicture) {
     });
 }
 
-function resize(sourcePath, targetPath, maxSize) {
-    return new Promise(function(resolve, reject) {
-        lwip.open(sourcePath, function(err, image){
+function resize(sourcePath, targetPath, maxSize, quality) {
+   return new Promise(function(resolve, reject) {
+        sharp(sourcePath)        
+        .resize(maxSize).max().withoutEnlargement()
+        .rotate()
+        .quality(quality)
+        .toFile(targetPath, function(err) {
             if (err) {
                 return reject(err);
             }
-
-            var width = image.width(),
-                height = image.height(),
-                longerSide = Math.max(width, height),
-                scaleFactor = maxSize / longerSide;
-
-            image.batch()
-            .scale(scaleFactor, 'lanczos') 
-            .writeFile(targetPath, {quality: 45}, function(err) {
-                if (err) {
-                    return reject(err);
-                }
-                return resolve();
-            });
+            return resolve();
         });
     });     
 }

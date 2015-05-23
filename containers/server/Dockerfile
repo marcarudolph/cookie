@@ -7,20 +7,29 @@ WORKDIR /cookie/server
 
 CMD ["node", "/cookie/server/server.js"]
 
-# Build LWIP
-RUN apk add --update build-base python && \
-	mkdir -p /tmp/lwipbuild && \
-	cd /tmp/lwipbuild && \
-	npm install --production lwip && \
-	rm -rf npm* && \
-	rm -rf node_modules/lwip/src && \
-	rm -rf node_modules/lwip/tests && \
-	rm -rf node_modules/lwip/examples && \
-	apk del build-base python
+# Build Libvips / Sharp
+RUN apk add --update curl bash build-base python glib-dev libxml2-dev pkgconfig tiff-dev libjpeg-turbo-dev libpng-dev libgsf-dev && \
+	cd /tmp/ && \
+	wget http://www.vips.ecs.soton.ac.uk/supported/current/vips-8.0.2.tar.gz && \
+	tar -xzvf vips-8.0.2.tar.gz && \
+	cd vips* && \
+	./configure && \
+	make && \
+	make install && \
+	cd .. && \
+	rm -rf vips* && \
+					\
+	mkdir -p /tmp/sharpbuild && \
+	cd /tmp/sharpbuild && \
+	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash - && \
+	export CPLUS_INCLUDE_PATH=/usr/local/include && \
+	npm install --production sharp && \
+					\
+	apk del curl bash build-base python glib-dev libxml2-dev pkgconfig tiff-dev libjpeg-turbo-dev libpng-dev libgsf-dev 
 
 ADD ./server/package.json /cookie/server/package.json
 RUN cd /cookie/server && \
-	mv /tmp/lwipbuild/node_modules ./ && \
+	mv /tmp/sharpbuild/node_modules ./ && \
 	npm install --production
 
 ADD . /cookie
