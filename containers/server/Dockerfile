@@ -25,6 +25,7 @@ RUN apk add --update curl bash build-base python glib-dev libxml2-dev pkgconfig 
 	export CPLUS_INCLUDE_PATH=/usr/local/include && \
 	npm install --production sharp && \
 					\
+	apk add --update glib libxml2 pkgconfig tiff libjpeg-turbo libpng libgsf && \ 
 	apk del curl bash build-base python glib-dev libxml2-dev pkgconfig tiff-dev libjpeg-turbo-dev libpng-dev libgsf-dev 
 
 ADD ./server/package.json /cookie/server/package.json
