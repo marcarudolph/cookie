@@ -54,9 +54,11 @@ module.exports = function(grunt) {
         shell: {
             "server-build": {
                 command: 'docker build -t cookieserver .',
-                execOptions: {
-                  cwd: 'server/build',
-                  maxBuffer: 1024*1024
+                options: {
+                  execOptions: {
+                    cwd: 'server/build',
+                    maxBuffer: 1024*1024
+                  }
                 }
             },
             "server-tag": {
