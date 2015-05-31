@@ -1,8 +1,8 @@
-FROM baseimage
+FROM alpine:3.1
 
 MAINTAINER Marc Rudolph <marc.a.rudolph@gmail.com>
 
-RUN apt-get install -y curl
+RUN apk add --update curl bash
 
 ADD https://raw.githubusercontent.com/andreafabrizi/Dropbox-Uploader/master/dropbox_uploader.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/dropbox_uploader.sh
