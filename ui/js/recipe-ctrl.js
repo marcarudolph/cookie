@@ -5,6 +5,8 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
     var id = $routeParams.recipeId;
     $scope.recipe = {};
 
+    $scope.ingredientValues = {};
+
     function createNewRecipe() {
         var recipe = {
             origin: {
@@ -169,7 +171,11 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
     $scope.beginEdit = function () {
         $scope.recipeBackup = JSON.parse(JSON.stringify($scope.recipe));
         $scope.edit = true;
-        $scope.tagFetcher = $scope.tagFetcher || $http.get("/api/tags")
+        $scope.tagFetcher = $scope.tagFetcher || $http.get("/api/tags");
+
+        fetchIngredientValues('name');
+        fetchIngredientValues('unit');
+        fetchIngredientValues('comment');
 
     };
     
@@ -211,8 +217,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
         query = query.toLowerCase();
         return $q(function(resolve, reject) {
             $scope.tagFetcher
-            .then(function(response) {
-                var tags = response.data;
+            .success(function(tags) {
                 var matchingTags = tags.filter(function(t) { 
                     return t.tag.toLowerCase().indexOf(query) === 0;}
                 );
@@ -225,6 +230,22 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
             .catch(reject);
         });
     }  
+
+    function fetchIngredientValues(field) {
+
+        var plural = field + "s",
+            uri = "/api/recipes/values/ingredients." + field;
+
+        if($scope.ingredientValues[plural]) {
+            return;
+        }
+
+        $scope.ingredientValues[plural] = [];
+        $http.get(uri)
+        .success(function(values) {
+            $scope.ingredientValues[plural] = values;
+        });
+    }
     
     function renameAndSaveRecipeToServer(recipe){
         $.ajax({

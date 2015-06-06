@@ -195,6 +195,57 @@ var recipeServices = {
             });            
         }
 
+
+        recipeServices.getFieldValues = function(fieldPath) {
+            return new Promise(function(resolve, reject) {
+                var queryBody = {
+                    size: 0,
+                    aggs: {
+                        terms: { 
+                            terms: { 
+                                field: fieldPath,
+                                order: { '_term': 'asc'},
+                                size: 10000
+                            }
+                        },
+                        rawTerms: { 
+                            terms: { 
+                                field: fieldPath + '.raw',
+                                order: { '_term': 'asc'},
+                                size: 10000
+                            }
+                        }
+                    }
+                };
+
+                app.database.search({
+                    index: config.indexes.cookie,
+                    type: "recipe",
+                    body: queryBody
+                })
+                .then(function(result) {
+                    var hasRawValues = result.aggregations.rawTerms.buckets.length > 0;
+
+                    var buckets;
+                    if (hasRawValues) {
+                        buckets = result.aggregations.rawTerms.buckets;
+                    }
+                    else {
+                       buckets = result.aggregations.terms.buckets;
+                    }
+
+                    var values = buckets.map(function (bucket) {
+                        return bucket.key;
+                    });
+
+                    resolve(values);
+                })
+                .catch(reject);
+            });            
+
+        }
+
+
         function getIdFromRecipeTitle(title) {
             var tmp = title.toLowerCase();
             
@@ -209,7 +260,6 @@ var recipeServices = {
             
             return tmp;
         } 
-
     }
 };
 module.exports = recipeServices;

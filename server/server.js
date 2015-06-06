@@ -309,6 +309,15 @@ app.get("/api/tags", cacheControl.dontCache, security.ensureAuthenticated, funct
     });  
 });
 
+app.get("/api/recipes/values/:fieldPath", cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+    recipeServices.getFieldValues(req.params.fieldPath)
+    .then(function(values) {
+        resp.send(values);
+    })
+    .catch(function(err) {
+        sendError(resp, err);
+    });  
+});
 
 app.get('/api/admin/recipes/update', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
     
