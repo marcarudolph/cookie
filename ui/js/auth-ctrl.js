@@ -7,18 +7,8 @@ function AuthCtrl($scope, Page) {
     
     $scope.isSignedIn = (currentUser !== null);
 
-/*    
-    if (!$scope.isSignedIn) {
-        var storedAuthType = localStorage.authType;
-        if (storedAuthType) {
-            window.location.href='/auth/' + storedAuthType;
-        }
-    }
-*/    
     $scope.signOut = function() {        
-        localStorage.removeItem('authType');
-            window.location.href='/logout';        
+        window.location.href='/logout';        
     };
 }
 
-//SigninCtrl.$inject = ['$scope', Page];

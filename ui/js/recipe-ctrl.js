@@ -34,18 +34,18 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
         
         Page.setTitle('Lade Rezept...');
         
-        $.getJSON(url).done(function (recipe) {
+        $http.get(url)
+        .success(function (recipe) {
             Page.setTitle(recipe.title);
                             
             $scope.recipe = recipe;
 
             $scope.displayCopy = JSON.parse(JSON.stringify(recipe));
-            $scope.$apply(function () {
-                updateCalculatedProperties();
-                $scope.original_title = recipe.title;
-                $scope.edit = false;
-            });
-        }).fail(function() {
+            updateCalculatedProperties();
+            $scope.original_title = recipe.title;
+            $scope.edit = false;
+        })
+        .error(function() {
             Page.setTitle('Ooops...');
         });        
     }
@@ -295,7 +295,3 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
         createNewRecipe();
     
 }
-
-
-
-//RecipeCtrl.$inject = ['$scope', $routeParams, Page, $upload];

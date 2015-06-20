@@ -2,7 +2,7 @@
 
 var savedQuery = "";
 
-function RecipesCtrl($scope, $http, $sce, Page) {
+function RecipesCtrl($q, $scope, $http, $sce, Page) {
 
     Page.setTitle('Deine Rezepte');
 
@@ -12,17 +12,25 @@ function RecipesCtrl($scope, $http, $sce, Page) {
     $scope.itemsToShow = 0;
     $scope.hasMoreRecipes = true;
     
-    var isPagePending = false;
+    var isPagePending = false,
+        pendingRequestAbort = null;
 
     $scope.$watch('query', function() {
         savedQuery = $scope.query;
         $scope.itemsToShow = 50;
         $scope.hasMoreRecipes = true;
+
+        if (pendingRequestAbort) {
+            pendingRequestAbort.resolve();
+            pendingRequestAbort = null;
+        }
+
         fetchRecipes(true);
     });
 
     $scope.getFromCK = function() {
-        $.getJSON('/api/fetchCK/' + $scope.ckId).done(function (newRecipe) {
+        $http.get('/api/fetchCK/' + $scope.ckId)
+        .success(function (newRecipe) {
             window.location.href = "/#/recipes/" + newRecipe._id;
         });
     };
@@ -50,22 +58,28 @@ function RecipesCtrl($scope, $http, $sce, Page) {
         if (neededSize <= 0)
             return;
 
-        $.getJSON(url).done(function (data) {
-            $scope.$apply(function () {
-                isPagePending = false;
-                if (reset) {
-                    $scope.recipes = [];
-                }
+        pendingRequestAbort = $q.defer();
 
-                $scope.recipes = $scope.recipes.concat(data);
-                if (data.length < neededSize) {
-                    $scope.hasMoreRecipes = false;
-                }
-            });
-        }).fail(function(a, b, c) {
+        $http({
+            method: "get",
+            url: url,
+            timeout: pendingRequestAbort.promise
+        })
+        .success(function (data) {
+            isPagePending = false;
+            pendingRequestAbort = null;
+
+            if (reset) {
+                $scope.recipes = [];
+            }
+
+            $scope.recipes = $scope.recipes.concat(data);
+            if (data.length < neededSize) {
+                $scope.hasMoreRecipes = false;
+            }
+        })
+        .error(function(a, b, c) {
             console.error(a);
         });        
     }
 }
-
-//RecipesCtrl.$inject = ['$scope', Page];

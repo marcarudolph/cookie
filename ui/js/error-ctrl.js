@@ -6,5 +6,3 @@ function ErrorCtrl($scope, Page) {
     $scope.errors = app.errors;
     
 }
-
-//SigninCtrl.$inject = ['$scope', Page];

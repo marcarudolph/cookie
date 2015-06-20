@@ -87,16 +87,6 @@ module.exports = {
 				return next();
 
 			next();
-			// loadUser(req.user)
-			// .then(function (fullUser) {
-			// 	req.user = fullUser;
-
-			// 	return next();
-			// })
-			// .catch(function (err) {
-			// 	errorHandling.formatAndLogError(err, "auth via token - load user")
-			// 	return res.sendStatus(401);
-			// });
 		})
 		.catch(function(err) {
 			console.log("auth via token - checkAndGetAuthTokenData failed with error " + err.stack);
@@ -107,12 +97,14 @@ module.exports = {
 
 function appendTokenToResponse(req, res) {
 
-	var token = generateTokenFromUser(req.user);
+	var token = generateTokenFromUser(req.user),
+		oneWeek = 7 * 24 * 60 * 60 * 1000;
 
 	res.cookie(
 		"Authorization",
 		"Bearer " + token,
 		{
+			maxAge: oneWeek
 			//secure: true
 		}
 	);	

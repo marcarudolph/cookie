@@ -1,128 +1,24 @@
 'use strict';
 
-/* App Module */
+var app = angular.module('cookie', ['angularFileUpload', 'ngRoute', 'tagedit', 'infiniteScroll', 'QuickList']);
 
-var app = angular.module('cookie', ['angularFileUpload', 'ngRoute', 'tagedit', 'infiniteScroll', 'QuickList']).
-config(['$routeProvider', function($routeProvider) {
-    $routeProvider.
-    when('/', {
-        templateUrl: 'partials/recipes.html',
-        controller: RecipesCtrl
-    }).
-    when('/auth', {
-        templateUrl: 'partials/auth.html',
-        controller: AuthCtrl
-    }).
-    when('/error', {
-        templateUrl: 'partials/error.html',
-        controller: ErrorCtrl
-    }).
-    when('/recipes/:recipeId', {
-        templateUrl: 'partials/recipe.html',
-        controller: RecipeCtrl
-    }).
-    otherwise({
-        redirectTo: '/'
-    });
+app.config(['$httpProvider', function($httpProvider) {
+
+    $httpProvider.interceptors.push(['$q', 'Page',
+        function($q, Page) {
+            return {
+                'responseError': function(err) {
+                    if (err.status === 401) {
+                        Page.authenticateUser();
+                    }
+                    return $q.reject(err);
+                }
+            };
+        }
+    ]);
+
+
 }]);
 
-app.directive('markdown', function () {
-    var showdown = new Showdown.converter();
-    return {
-        link: function (scope, element, attrs) {
-            var markdown = scope[attrs.markdown];
-
-            function safeTags(str) {
-                if (!str)
-                    return str;
-
-                return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
-            }
-
-            function stripWrappingPTag(html) {
-                if (html.indexOf('<p>') === 0)
-                    html = html.substr(3);
-                if (html.substr(html.length - 4) === "</p>")
-                    html = html.substring(0, html.length - 4);
-                    
-                return html;
-            }
-
-            function updateContent() {
-                
-                if (!markdown) {
-                    element.html("");
-                    return;
-                }
-                
-                var safeMarkdown = safeTags(markdown);
-                
-                var htmlText = showdown.makeHtml(safeMarkdown);
-                
-                htmlText = stripWrappingPTag(htmlText);
-                
-                element.html(htmlText);            
-            }
-
-            scope.$watch(attrs.markdown, function(value) {
-                markdown = value;
-                updateContent();
-            });
-            
-            updateContent();
-        }
-    };
-
-});
 
 
-app.factory('Page', function() {
-    var title = '';
-    var authUser = null;
-    return {
-        title: function() {
-            return title;
-        },
-        setTitle: function(newTitle) {
-            title = newTitle;
-        },
-
-        authUser: function() {
-            return authUser;
-        },
-        setAuthUser: function(user) {
-            authUser = user;
-            localStorage.authType = user.authType;
-        }
-    };
-});
-
-app.controller('PageCtrl', PageCtrl);
-
-function PageCtrl($scope, $http, Page) {
-    
-    $http.get('/api/init')
-    .success(function (appData) {
-        if (appData.errors && appData.errors.length > 0) {
-            app.errors = appData.errors;
-            window.location.href="/#/error";
-        }
-        else if (!appData.user) {
-            window.location.href="/#/auth";
-        }
-        else {
-            Page.setAuthUser(appData.user)
-        }
-    })
-    .error(function(data, status, headers, config) {
-        if (status === 401) {
-            window.location.href="/#/auth";        
-        }
-        else {
-            window.location.href="/#/error";            
-        }
-    });
-    
-    
-    $scope.Page = Page;
-}
