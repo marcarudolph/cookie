@@ -2,21 +2,28 @@
 
 var savedQuery = "";
 
+document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+
+
+
 function RecipesCtrl($q, $scope, $http, $sce, Page) {
 
     Page.setTitle('Deine Rezepte');
-
 
     $scope.recipes = [];
     $scope.query = savedQuery;
     $scope.itemsToShow = 0;
     $scope.hasMoreRecipes = true;
     
+    $scope.fetcher = null;
+
     var isPagePending = false,
         pendingRequestAbort = null;
 
     $scope.$watch('query', function() {
-        savedQuery = $scope.query;
+        var query = savedQuery = $scope.query;
+
         $scope.itemsToShow = 50;
         $scope.hasMoreRecipes = true;
 
@@ -25,7 +32,8 @@ function RecipesCtrl($q, $scope, $http, $sce, Page) {
             pendingRequestAbort = null;
         }
 
-        fetchRecipes(true);
+        $scope.fetcher = function(start, count) { return fetch(query, start, count); };
+        //fetchRecipes(true);
     });
 
     $scope.getFromCK = function() {
@@ -45,6 +53,52 @@ function RecipesCtrl($q, $scope, $http, $sce, Page) {
 
         $scope.itemsToShow += 50;
         fetchRecipes();
+    }
+
+    function fetch(query, start, count) {
+        return $q(function(resolve, reject) {
+            var url = '/api/recipes/?q=' + query + "&from=" + start + "&size=" + count;
+            pendingRequestAbort = $q.defer();
+
+            $http({
+                method: "get",
+                url: url,
+                timeout: pendingRequestAbort.promise
+            })
+            .success(function (recipes) {
+                isPagePending = false;
+                pendingRequestAbort = null;
+
+                transformMarkdown(recipes);
+
+                resolve(recipes);
+            })
+            .error(function(a, b, c) {
+                reject(a);
+            });        
+
+        });
+
+        function transformMarkdown(recipes) {
+            var showdown = new Showdown.converter();
+            _.each(recipes, function(recipe) {
+                if (recipe.title) {
+                    recipe.title = stripWrappingPTag(showdown.makeHtml(recipe.title));                        
+                }
+                if (recipe.subtitle) {
+                    recipe.subtitle = stripWrappingPTag(showdown.makeHtml(recipe.subtitle));
+                }
+            });
+
+            function stripWrappingPTag(html) {
+                if (html.indexOf('<p>') === 0)
+                    html = html.substr(3);
+                if (html.substr(html.length - 4) === "</p>")
+                    html = html.substring(0, html.length - 4);
+                    
+                return html;
+            }                      
+        }
     }
 
 

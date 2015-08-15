@@ -248,32 +248,23 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
     }
     
     function renameAndSaveRecipeToServer(recipe){
-        $.ajax({
-              type: "POST",
-              url: "/api/recipes/?action=rename",
-              dataType: "json",
-              contentType : 'application/json',
-              data: angular.toJson({
-                  oldId: recipe._id, 
-                  title: recipe.title })
-            }).done(function( response ){
-                recipe._id = response._id; 
-                saveRecipeToServer(recipe);
-                window.location.href = "/#/recipes/" +  recipe._id;
-            });
+        $http.post('/api/recipes/?action=rename',
+            {
+                oldId: recipe._id, 
+                title: recipe.title
+            }
+        )
+        .success(function(response) {
+            recipe._id = response._id; 
+            saveRecipeToServer(recipe);
+            window.location.href = "/#/recipes/" +  recipe._id;
+        });
     }
     
     function saveRecipeToServer(recipe){
-        $.ajax({
-            type: "PUT",
-            url: './api/recipes/' + recipe._id,
-            dataType: "json",
-            contentType : 'application/json',
-            data: angular.toJson(recipe)
-        }).done(function(){
-            $scope.$apply(function(){
-                refreshDisplayCopy();    
-            });            
+        $http.put('/api/recipes/' + recipe._id, recipe)
+        .success(function(response) {
+            refreshDisplayCopy();    
         });
     }  
 

@@ -1,4 +1,4 @@
-<div class="panel panel-success" >
+<div class="panel panel-success" style="position: relative; min-height:100%">
     <div class="panel-heading">
         <span class="h3">Rezepte</span>
         <div class="pull-right">
@@ -9,25 +9,31 @@
         <input class="search-box" ng-model="query" ng-model-options="{ debounce: 200 }" placeholder="Suche...">
         <span class="clickable" ng-click="query = ''">X</span>
     </div>
-    <ul class="recipe-list" style="height: 600px; overflow-y: auto;" infinite-scroll="addAPage()" threshold="100" can-load="hasMoreRecipes">
-        <li quick-ng-repeat="recipe in recipes" quick-repeat-list="recipes">
-            <a href="#/recipes/{{::recipe._id}}">
-                <div class="clickable-content">
-                    <div ng-if="::recipe.titlePicture" class="recipe-title-image" style="background-image:url(pics/thumbnails/{{::recipe.titlePicture}})">&nbsp;</div>
-                    <div ng-if="::!recipe.titlePicture" class="recipe-title-image">&nbsp;</div>
-                    <div class="recipe-description">
-                        <span class="recipe-title" markdown="recipe.title"></span><br>
-                        <span class="recipe-subtitle" markdown="recipe.subtitle"></span>
-                    </div>
-
-                </div>
+  
+    <div infinite-scroll="recipe in fetcher" class="recipe-list">
+        <li>
+            <a href="#/recipes/[[:recipe._id]]">
+                [[ if (recipe.titlePicture) { ]]          
+                    <div class="recipe-title-image" style="background-image:url(pics/thumbnails/[[:recipe.titlePicture]])">&nbsp;</div>                    
+                [[ } else { ]]         
+                    <div class="recipe-title-image">&nbsp;</div>
+                [[ } ]]           
             </a>
-            <div class="recipe-tags">
-                <span ng-repeat="tag in ::recipe.tags track by tag" class="tag label label-default" ng-click="filterByTag(tag);" markdown="::tag"></span>
+            <div class="recipe-description">
+                <a href="#/recipes/[[:recipe._id]]">
+                    <div class="recipe-title">[[:recipe.title]]</div>
+                    <div class="recipe-subtitle">[[:recipe.subtitle]]</div>
+                </a>
             </div>
-        </li>
-    </ul>
-    
+
+            <div class="recipe-tags">
+                [[ _.each(recipe.tags, function(tag) { ]]
+                   <span class="tag label label-default" ng-click="filterByTag('[[:tag]]');">[[:tag]]</span>
+                [[ }); ]] 
+            </div>
+        </li>        
+    </div>
+
 </div>
 <hr>
 <div class="panel panel-success">

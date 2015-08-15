@@ -1,0 +1,234 @@
+html, body, .container {
+    height: 100%;    
+}
+
+body {
+    padding-top: 5px;
+}
+
+a, .clickable {
+    color: #3c763d;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.ng-dirty.ng-invalid {
+    border:1px solid Red;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 999px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.search-box {
+    margin: 10px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.recipe-list {
+    padding-left: 0px;
+}
+
+.recipe-list strong {
+    color: red;
+}
+
+.recipe-list li {
+    border-top: 1px solid #dff0d8;
+
+    display: block;
+
+    padding: 0 10px;
+    height: 120px;
+    line-height: 40px;
+}
+
+.recipe-list li:hover {
+    background-color: #f4f4f4;
+}
+
+.recipe-list .recipe-description {
+    min-height: 60px;
+}
+
+.recipe-list .recipe-title {
+    white-space: nowrap;
+    font-weight: bold;
+    font-size: 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;       
+}
+.recipe-list .recipe-subtitle {
+    white-space: nowrap;
+    font-size: 0.8em;       
+    overflow: hidden;
+    text-overflow: ellipsis;       
+}
+
+.recipe-list .recipe-title-image {
+    width: 100px; 
+    height: 60px; 
+    display: inline-block;
+    background: no-repeat center center;
+    background-size: cover;
+    margin-right: 10px;
+    float: left;
+}
+
+.recipe-list .recipe-tags {
+    display: inline-block;
+    max-height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.recipe-tags .tag {
+    margin-right: 5px;
+    white-space: pre-wrap;
+}
+
+.recipe-list .recipe-tags .tag {
+    cursor: pointer;
+}
+
+.tags-wrapper {
+    position: relative;
+}
+.tags-cloud .tag {
+    float: left;
+    padding: 4px 6px;
+    font-size: 1em;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    background: #f2f2f2;
+    font-weight: 600;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #dddddd;
+}
+.tags-cloud .tag:hover {
+    border: 1px solid #cccccc;
+}
+.tags-cloud .tag:hover .cross {
+    opacity: 1;
+}
+.tags-cloud .tag .cross {
+    margin-left: 5px;
+    margin-right: 3px;
+    font-size: 1em;
+    color: #20a28e;
+    opacity: .7;
+    cursor: pointer;
+}
+.suggestions-list {
+    z-index: 10;
+    position: absolute;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    font-size: 14px;
+}
+.suggestions-list li {
+    color: #333333;
+    font-weight: 600;
+    padding: 4px 25px;
+    font-size: 1em;
+    cursor: pointer;
+    background: #f2f2f2;
+    border-bottom: 1px solid #dddddd;
+}
+.suggestions-list li:hover {
+    background: #dddddd;
+}
+.suggestions-list li:active,
+.suggestions-list li.active {
+    color: #3c763d;
+    background: #dddddd;
+}
+.suggestions-list:focus{
+    outline:none;
+}   
+
+.is-wrapper {
+    position: absolute;
+    z-index: 1;
+    top: 100px;
+    bottom: 48px;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+.is-scroller {
+    position: absolute;
+    z-index: 1;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    width: 100%;
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-text-size-adjust: none;
+    -moz-text-size-adjust: none;
+    -ms-text-size-adjust: none;
+    -o-text-size-adjust: none;
+    text-size-adjust: none;
+}
+
+.is-scroller ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    position: relative;
+}
+
+.is-scroller li {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    -webkit-transform: translateZ(0);
+    -moz-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    -o-transform: translateZ(0);
+    transform: translateZ(0);
+}
