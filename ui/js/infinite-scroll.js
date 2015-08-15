@@ -83,6 +83,7 @@
                 infiniteElements: '.is-scroller .is-row',
                 dataset: requestData,
                 dataFiller: renderTemplate,
+                preventDefault: false,
                 cacheSize: 250
             });
         }
