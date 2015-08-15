@@ -10,6 +10,13 @@ a, .clickable {
     color: #3c763d;
 }
 
+.overlay {
+    background: white;
+    position: absolute;
+    z-index: 100;
+    width: 100%;    
+}
+
 .clickable {
     cursor: pointer;
 }
@@ -46,6 +53,7 @@ a, .clickable {
 }
 
 .recipe-list {
+    top: 94px;
     padding-left: 0px;
 }
 
@@ -184,8 +192,7 @@ a, .clickable {
 .is-wrapper {
     position: absolute;
     z-index: 1;
-    top: 100px;
-    bottom: 48px;
+    bottom: 0px;
     left: 0;
     width: 100%;
     overflow: hidden;

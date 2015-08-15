@@ -1,16 +1,24 @@
-<div class="panel panel-success" style="position: relative; min-height:100%">
+<div class="panel panel-success" style="position: relative; min-height:95%">
     <div class="panel-heading">
         <span class="h3">Rezepte</span>
         <div class="pull-right">
             <a class="btn btn-default" href="#/recipes/_new"><span class="glyphicon glyphicon-plus"></span></a>
+            <a class="btn btn-default" ng-click="isCKOpen = !isCKOpen"><span>CK</span></a>
         </div>
     </div>
+    <div ng-if="isCKOpen" class="overlay panel">
+        <form ng-submit="getFromCK()">
+            <input type="text" ng-model="ckId"  size="30"
+                   placeholder="CK ID">
+            <input class="btn btn-primary" type="submit" value="Get it!">
+        </form>
+    </div>    
     <div>
-        <input class="search-box" ng-model="query" ng-model-options="{ debounce: 200 }" placeholder="Suche...">
+        <input class="search-box" ng-model="query" ng-model-options="{ debounce: 200 }" placeholder="Suche..." style="width:80%">
         <span class="clickable" ng-click="query = ''">X</span>
     </div>
   
-    <div infinite-scroll="recipe in fetcher" class="recipe-list">
+    <div infinite-scroll="recipe in fetcher" class="recipe-list" >
         <li>
             <a href="#/recipes/[[:recipe._id]]">
                 [[ if (recipe.titlePicture) { ]]          
@@ -34,15 +42,4 @@
         </li>        
     </div>
 
-</div>
-<hr>
-<div class="panel panel-success">
-    <div class="panel-heading">
-        <span class="h5">Aus CK</span>
-    </div>
-    <form ng-submit="getFromCK()">
-        <input type="text" ng-model="ckId"  size="30"
-               placeholder="CK ID">
-        <input class="btn btn-primary" type="submit" value="Get it!">
-    </form>
 </div>
