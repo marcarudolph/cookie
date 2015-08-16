@@ -6,7 +6,7 @@
             <a class="btn btn-default" ng-click="isCKOpen = !isCKOpen"><span>CK</span></a>
         </div>
     </div>
-    <div ng-if="isCKOpen" class="overlay panel">
+    <div ng-show="isCKOpen" class="overlay panel">
         <form ng-submit="getFromCK()">
             <input type="text" ng-model="ckId"  size="30"
                    placeholder="CK ID">
