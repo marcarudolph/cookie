@@ -54,7 +54,7 @@
             var row = document.createElement('li')
             row.className = 'is-row';
 
-            for (var i = 0; i < 100; i++) {
+            for (var i = 0; i < 50; i++) {
                 list.appendChild(row.cloneNode());
             }
             $element[0].appendChild(scroller);
@@ -70,6 +70,11 @@
                     });
                 }
             });
+
+            $element[0].addEventListener('touchmove', function(ev) {
+                ev.preventDefault();
+            });
+
         }
 
         function initScroller () {
