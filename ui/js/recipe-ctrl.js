@@ -58,7 +58,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
 
             var startsWithWhitespaceOrPunctuation = /^\W/;
             if (!startsWithWhitespaceOrPunctuation.test(ing.comment))
-                ing.padded_comment = " " + ing.padded_comment;
+                ing.padded_comment = ' ' + ing.padded_comment;
         });
         $scope.recalculateServings();
     }
@@ -74,10 +74,10 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
     }
     
     function insertNewElementOnLastElementTabKey(event, element, array, newHandler){
-        if (event.which !== 9
-            || event.altKey
-            || event.shiftKey
-            || event.ctrlKey)
+        if (event.which !== 9 ||
+            event.altKey ||
+            event.shiftKey ||
+            event.ctrlKey)
             return;
         
         if (array.indexOf(element) === array.length - 1) {
@@ -91,7 +91,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
     };
 
     $scope.addInstructionToRecipe = function (){
-        $scope.recipe.instructions.push("");
+        $scope.recipe.instructions.push('');
     };
     
     $scope.deleteInstruction = function (instruction){
@@ -108,10 +108,10 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
     $scope.addIngredientToRecipe = function (){
        $scope.recipe.ingredients.push(
             {
-              "name": "",
-              "comment": "",
-              "quantity": 1,
-              "unit": null,
+              'name': '',
+              'comment': '',
+              'quantity': 1,
+              'unit': null,
             });
     };
     
@@ -128,31 +128,19 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
     
     $scope.addLikeToRecipe = function()
     {
-        $.ajax({
-            type: "POST",
-            url: "/api/recipes/" + $scope.recipe._id + "/likes",
-            dataType: "json",
-            contentType : 'application/json',
-            data: angular.toJson({
-                  "action": "like" })
-        }).done(function(response){
-            loadRecipe($scope.recipe._id);
-        });
+         execLike('like');
     };
 
-    $scope.removeLikeFromRecipe = function()
-    {
-        $.ajax({
-            type: "POST",
-            url: "/api/recipes/" + $scope.recipe._id + "/likes",
-            dataType: "json",
-            contentType : 'application/json',
-            data: angular.toJson({
-                  "action": "dislike" })
-        }).done(function(response){
-            loadRecipe($scope.recipe._id);
-        });
+    $scope.removeLikeFromRecipe = function() {
+        execLike('dislike');
     };
+
+    function execLike(action) {
+        $http.post('/api/recipes/' + $scope.recipe._id + '/likes', {'action': action })
+        .success(function() {
+            loadRecipe($scope.recipe._id);
+        });        
+    }
 
     $scope.$watch('displayCopy.servings', function (newValue) {
         if (!newValue || !$scope.displayCopy.servings)
@@ -166,12 +154,12 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
         $scope.displayCopy.ingredients.map(function (ing) {
             ing.quantity_calc = Math.round(ing.quantity / $scope.recipe.servings * $scope.displayCopy.servings * 100) / 100;
         });
-    }
+    };
     
     $scope.beginEdit = function () {
         $scope.recipeBackup = JSON.parse(JSON.stringify($scope.recipe));
         $scope.edit = true;
-        $scope.tagFetcher = $scope.tagFetcher || $http.get("/api/tags");
+        $scope.tagFetcher = $scope.tagFetcher || $http.get('/api/tags');
 
         fetchIngredientValues('name');
         fetchIngredientValues('unit');
@@ -201,15 +189,10 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
     };
     
     $scope.saveNewRecipeToServer = function() {
-        $.ajax({
-            type: "POST",
-            url: './api/recipes/?action=new',
-            dataType: "json",
-            contentType : 'application/json',
-            data: angular.toJson($scope.recipe)
-        }).done(function(response){
-            window.location.href = "/#/recipes/" +  response._id;
-        });        
+        $http.post('/api/recipes/?action=new', $scope.recipe)
+        .success(function(response) {
+            window.location.href = '/#/recipes/' +  response._id;
+        });      
     };
 
     $scope.tagFetcher = null;
@@ -229,12 +212,12 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
             })
             .catch(reject);
         });
-    }  
+    }  ;
 
     function fetchIngredientValues(field) {
 
-        var plural = field + "s",
-            uri = "/api/recipes/values/ingredients." + field;
+        var plural = field + 's',
+            uri = '/api/recipes/values/ingredients.' + field;
 
         if($scope.ingredientValues[plural]) {
             return;
@@ -257,21 +240,21 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
         .success(function(response) {
             recipe._id = response._id; 
             saveRecipeToServer(recipe);
-            window.location.href = "/#/recipes/" +  recipe._id;
+            window.location.href = '/#/recipes/' +  recipe._id;
         });
     }
     
     function saveRecipeToServer(recipe){
         $http.put('/api/recipes/' + recipe._id, recipe)
-        .success(function(response) {
+        .success(function() {
             refreshDisplayCopy();    
         });
     }  
 
     $scope.onFileSelect = function($files) {
         $scope.upload = $upload.upload({
-            url: "/api/recipes/" + $scope.recipe._id + "/pictures/",
-            method: "POST",
+            url: '/api/recipes/' + $scope.recipe._id + '/pictures/',
+            method: 'POST',
             file: $files
         }).progress(function(evt) {
             console.log('percent: ' + parseInt(100.0 * evt.loaded / evt.total));
@@ -280,7 +263,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
         });
     };
     
-    if (id !== "_new")
+    if (id !== '_new')
         loadRecipe(id);
     else
         createNewRecipe();
