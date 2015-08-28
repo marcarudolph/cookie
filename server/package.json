@@ -17,7 +17,7 @@
     "jsonwebtoken": "^5.0.1",
     "memory-cache": "^0.1.2",
     "multer": "*",
-    "passport": "*",
+    "passport": "0.2.*",
     "passport-google-oauth": "^0.1.5",
     "passport-oauth": "^1.0.0",
     "request": "*",

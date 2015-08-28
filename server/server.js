@@ -23,12 +23,12 @@ console.log(JSON.stringify(global.config, null, ' '));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.use(multer({
+var upload = multer({
   dest: global.config.server.uploadTempPath,
   rename: function (fieldname, filename) {
     return filename.replace(/\W+/g, '-').toLowerCase() + Date.now()
   }
-}));
+});
 
 app.database = new elasticsearch.Client(global.config.database);
 
@@ -229,7 +229,7 @@ app.post('/api/recipes/:id/likes', cacheControl.dontCache, security.ensureAuthen
 });
 
 
-app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAuthenticated, function(req, resp) {
+app.post('/api/recipes/:id/pictures/', cacheControl.dontCache, security.ensureAuthenticated, upload.array('file0', 32), function(req, resp) {
     var files = req.files;
     var picturesToInsert = [];
     var rawPictures = [];
