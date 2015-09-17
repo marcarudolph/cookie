@@ -1,5 +1,5 @@
 var express = require('express'),
-    config = require('../config/cookie-config.js');
+    config = require('../../config/cookie-config.js');
 
 var cacheMaxAge = config.server.cacheMaxAge || 0;
 

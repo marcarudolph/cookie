@@ -1,4 +1,4 @@
-var config = require('../config/cookie-config.js'),
+var config = require('../../config/cookie-config.js'),
     Promise = require('es6-promise').Promise;
 
 const RECIPE_TEMPLATE = {

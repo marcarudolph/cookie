@@ -1,7 +1,7 @@
 "use strict";
 
 var Promise = require('es6-promise').Promise,
-    config = require('../config/cookie-config.js'),
+    config = require('../../config/cookie-config.js'),
     sharp = require('sharp');
 
 sharp.concurrency(1);

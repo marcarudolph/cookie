@@ -1,4 +1,4 @@
-var config = require('../config/cookie-config.js'),
+var config = require('../../config/cookie-config.js'),
 	passport = require('passport'),
 	userCache = require('memory-cache'),
     tokenAuth = require('./token-auth.js')({skipPathes: ['/auth/google', '/auth/google/return']});
@@ -11,7 +11,7 @@ module.exports = {
         function findUserById(id, done) {
             app.database.get({
                 index: config.indexes.cookie,
-                type: "user",
+                type: 'user',
                 id: id
             })
             .then(function(resp) {
@@ -22,7 +22,7 @@ module.exports = {
             .catch(function(err) {
             	console.log(err);
                 if (err.status == 404)
-                    return done(null, false, { message: "No user with id  " + id + " found"});
+                    return done(null, false, { message: 'No user with id  ' + id + ' found'});
                 else
                     return done(err, null);
             });
@@ -67,7 +67,7 @@ module.exports = {
 		app.get('/auth/google/return', 
 		  passport.authenticate('google', { failureRedirect: '/#/', failureFlash: false }),
 		  function(req, res) {
-		  	console.log("User:" + JSON.stringify(req.user));
+		  	console.log('User:' + JSON.stringify(req.user));
 		  	appendTokenToResponse(req, res);
 		    res.redirect('/');
 		  });
@@ -89,7 +89,7 @@ module.exports = {
 			next();
 		})
 		.catch(function(err) {
-			console.log("auth via token - checkAndGetAuthTokenData failed with error " + err.stack);
+			console.log('auth via token - checkAndGetAuthTokenData failed with error ' + err.stack);
 			return res.sendStatus(401);
 		});
 	}
@@ -101,8 +101,8 @@ function appendTokenToResponse(req, res) {
 		oneWeek = 7 * 24 * 60 * 60 * 1000;
 
 	res.cookie(
-		"Authorization",
-		"Bearer " + token,
+		'Authorization',
+		'Bearer ' + token,
 		{
 			maxAge: oneWeek
 			//secure: true

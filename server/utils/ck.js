@@ -1,7 +1,7 @@
 var https = require('https'),
     request = require("request"),
     Promise = require('es6-promise').Promise,
-    config = require('../config/cookie-config.js'),
+    config = require('../../config/cookie-config.js'),
     imaging = require("./imaging.js"),
     recipeServices = require('./recipe-services.js'),
     shortid = require("shortid"),

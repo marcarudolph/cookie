@@ -3,7 +3,7 @@
 var Promise = require('es6-promise').Promise,
 	expressJwt = require('./express-jwt.js'),
     jwt = require('jsonwebtoken'),
-    config = require('../config/cookie-config.js');
+    config = require('../../config/cookie-config.js');
 
 var encryptKey = config.auth.tokenSecret,
 	decryptKey = config.auth.tokenSecret,
