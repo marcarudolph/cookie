@@ -6,6 +6,8 @@
     "dependencies":{
         "elasticsearch": "*",
         "es6-promise": "*",
-        "request": "*"
+        "shortid": "*",
+        "request": "*",
+        "gm": "*"
     }
 }
