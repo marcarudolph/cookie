@@ -23,7 +23,7 @@ RUN apk add --update curl bash build-base python glib-dev libxml2-dev pkgconfig 
 	cd /tmp/sharpbuild && \
 	curl -s https://raw.githubusercontent.com/lovell/sharp/master/preinstall.sh | bash - && \
 	export CPLUS_INCLUDE_PATH=/usr/local/include && \
-	npm install --production sharp && \
+	npm install --production --unsafe-perm sharp && \
 					\
 	apk add --update glib libxml2 pkgconfig tiff libjpeg-turbo libpng libgsf && \ 
 	apk del curl bash build-base python glib-dev libxml2-dev pkgconfig tiff-dev libjpeg-turbo-dev libpng-dev libgsf-dev 
