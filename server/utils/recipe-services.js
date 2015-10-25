@@ -1,5 +1,4 @@
-var config = require('../../config/cookie-config.js'),
-    Promise = require('es6-promise').Promise;
+var Promise = require('es6-promise').Promise;
 
 const RECIPE_TEMPLATE = {
         "_id": null,
@@ -22,7 +21,7 @@ var recipeServices = {
         recipeServices.getRecipe = function(id) {
             return new Promise(function(resolve, reject) {
                 app.database.get({
-                    index: config.indexes.cookie,
+                    index: global.config.indexes.cookie,
                     type: "recipe",
                     id: id
                 })
@@ -116,7 +115,7 @@ var recipeServices = {
                     body.titlePicture = body.pictures[0].file;
 
                 app.database.index({
-                    index: config.indexes.cookie,
+                    index: global.config.indexes.cookie,
                     type: "recipe",
                     id: id,
                     body: body
@@ -130,7 +129,7 @@ var recipeServices = {
 
         recipeServices.deleteRecipe = function(recipeId) {
             return app.database.delete({
-                index: config.indexes.cookie,
+                index: global.config.indexes.cookie,
                 type: "recipe",
                 id: recipeId
             });
@@ -142,7 +141,7 @@ var recipeServices = {
             }            
             return new Promise(function(resolve, reject) {
                 app.database.exists({
-                    index: config.indexes.cookie,
+                    index: global.config.indexes.cookie,
                     type: "recipe",
                     id: recipe._id
                 })
@@ -167,7 +166,7 @@ var recipeServices = {
         recipeServices.getTags = function() {
             return new Promise(function(resolve, reject) {
                 app.database.search({
-                    index: config.indexes.cookie,
+                    index: global.config.indexes.cookie,
                     type: "recipe",
                     body: {
                        size: 0, 
@@ -219,7 +218,7 @@ var recipeServices = {
                 };
 
                 app.database.search({
-                    index: config.indexes.cookie,
+                    index: global.config.indexes.cookie,
                     type: "recipe",
                     body: queryBody
                 })

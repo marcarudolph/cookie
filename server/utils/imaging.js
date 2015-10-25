@@ -1,15 +1,14 @@
 "use strict";
 
 var Promise = require('es6-promise').Promise,
-    config = require('../../config/cookie-config.js'),
     sharp = require('sharp');
 
 sharp.concurrency(1);
 
 exports.generatePicAndThumb = function generatePicAndThumb(rawPicture) {
 
-    var targetPath = config.pictures.directory + "/" +  rawPicture.targetFileName;
-    var thumbnailPath = config.pictures.directory + "/thumbnails/" +  rawPicture.targetFileName;
+    var targetPath = global.config.pictures.directory + "/" +  rawPicture.targetFileName;
+    var thumbnailPath = global.config.pictures.directory + "/thumbnails/" +  rawPicture.targetFileName;
 
     return new Promise(function(resolve, reject) {
         resize(rawPicture.localPath.path, targetPath, 2048, 40)

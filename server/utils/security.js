@@ -1,6 +1,4 @@
-var config = require('../../config/cookie-config.js'),
-	passport = require('passport'),
-	userCache = require('memory-cache'),
+var passport = require('passport'),
     tokenAuth = require('./token-auth.js')({skipPathes: ['/auth/google', '/auth/google/return']});
     GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
@@ -10,7 +8,7 @@ module.exports = {
     	
         function findUserById(id, done) {
             app.database.get({
-                index: config.indexes.cookie,
+                index: global.config.indexes.cookie,
                 type: 'user',
                 id: id
             })
@@ -44,9 +42,9 @@ module.exports = {
 		});
 
 		var google = new GoogleStrategy({
-			    clientID: config.auth.clientID,
-			    clientSecret: config.auth.clientSecret,
-		        callbackURL: config.server.baseurl + '/auth/google/return'
+			    clientID: global.config.auth.clientID,
+			    clientSecret: global.config.auth.clientSecret,
+		        callbackURL: global.config.server.baseurl + '/auth/google/return'
 		    },
 		    function (accessToken, refreshToken, profile, done) {
 		    	var id = profile._json.email;

@@ -1,7 +1,6 @@
-var express = require('express'),
-    config = require('../../config/cookie-config.js');
+var express = require('express');
 
-var cacheMaxAge = config.server.cacheMaxAge || 0;
+var cacheMaxAge = global.config.server.cacheMaxAge || 0;
 
 function dontCache(req, resp, next) {
     resp.setHeader('Cache-Control', 'no-cache, no-store, max-age=0');

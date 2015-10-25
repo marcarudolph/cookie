@@ -2,11 +2,10 @@
 
 var Promise = require('es6-promise').Promise,
 	expressJwt = require('./express-jwt.js'),
-    jwt = require('jsonwebtoken'),
-    config = require('../../config/cookie-config.js');
+    jwt = require('jsonwebtoken');
 
-var encryptKey = config.auth.tokenSecret,
-	decryptKey = config.auth.tokenSecret,
+var encryptKey = global.config.auth.tokenSecret,
+	decryptKey = global.config.auth.tokenSecret,
 	algorithm = "HS256";
 
 module.exports = function(options) {

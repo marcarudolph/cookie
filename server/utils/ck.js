@@ -1,7 +1,6 @@
 var https = require('https'),
     request = require("request"),
     Promise = require('es6-promise').Promise,
-    config = require('../../config/cookie-config.js'),
     imaging = require("./imaging.js"),
     recipeServices = require('./recipe-services.js'),
     shortid = require("shortid"),
@@ -209,7 +208,7 @@ function getPics(recipe) {
             prom = prom.then(function() {
                 var url = pic.file,
                     hash = require('crypto').createHash('md5').update(url).digest('hex'),
-                    targetPath = config.server.uploadTempPath + "/" + hash + ".jpg";
+                    targetPath = global.config.server.uploadTempPath + "/" + hash + ".jpg";
                 nameMap[url] = targetPath;
                 if (fs.existsSync(targetPath)) {
                     return new Promise(function(resolve, reject) { resolve() });
