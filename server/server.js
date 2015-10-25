@@ -33,7 +33,7 @@ require('./request-handlers/ck.js').init(app);
 require('./request-handlers/tags.js').init(app);
 
 
-app.use(express.static(__dirname + '/../ui/'));
+app.use(express.static(__dirname + '/../grunt/build/ui/'));
 app.use('/pics', function(req, resp, next) {
     cacheControl.doCache(req, resp, function() {
         express.static(global.config.pictures.directory)(req, resp, next);

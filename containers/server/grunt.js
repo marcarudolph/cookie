@@ -1,5 +1,13 @@
 module.exports = function(grunt) {
     grunt.config.merge({
+        run_grunt: {
+            'ui-build': {
+                options: {
+                    task: ['release']
+                },
+                src: ['../grunt/Gruntfile.js']
+            }
+        },          
         sync: {
             "server-server": {
                 files: [{
@@ -15,12 +23,12 @@ module.exports = function(grunt) {
             },
             "server-ui": {
                 files: [{
-                  cwd: '../ui',
+                  cwd: '../grunt/build',
                   src: [
                     '**',
                     '!node_modules/**'
                   ],
-                  dest: 'server/build/ui'
+                  dest: 'server/build/grunt/build'
                 }],
                 verbose: true,
                 updateAndDelete: true
