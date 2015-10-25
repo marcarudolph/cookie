@@ -39,6 +39,7 @@ function Page() {
 };
 
 
+PageCtrl.$inject = ['$scope', '$http', 'Page'];
 function PageCtrl($scope, $http, Page) {
     $http.get('/api/init')
     .success(function (appData) {

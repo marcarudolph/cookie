@@ -1,5 +1,7 @@
 'use strict';
 
+
+RecipeCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q'];
 function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
 
     var id = $routeParams.recipeId;

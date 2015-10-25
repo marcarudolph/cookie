@@ -1,5 +1,7 @@
 'use strict';
 
+
+AuthCtrl.$inject = ['$scope', 'Page'];
 function AuthCtrl($scope, Page) {    
     Page.setTitle('Sign in');
     
