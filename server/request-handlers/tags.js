@@ -9,7 +9,7 @@ exports.init = init;
 function init(app) {
     app.get('/api/tags', function(req, resp) {
         recipeServices.getTags()
-        .then(respond.withData)
+        .then(respond.withData(resp))
         .catch(respond.withError(resp));            
     });
 }

@@ -65,7 +65,7 @@ function init(app) {
             });
             return recipes;
         })
-        .then(respond.withData)
+        .then(respond.withData(resp))
         .catch(respond.withError(resp));
     });
 
@@ -73,7 +73,7 @@ function init(app) {
     app.get('/api/recipes/:id', function(req, resp) {    
 
         recipeServices.getRecipe(req.params.id)
-        .then(respond.withData)
+        .then(respond.withData(resp))
         .catch(respond.withError(resp));
     });
 
@@ -84,7 +84,7 @@ function init(app) {
         recipe._id = req.params.id;
         
         recipeServices.updateRecipe(recipe)
-        .then(respond.withData)
+        .then(respond.withData(resp))
         .catch(respond.withError(resp));
 
     });
@@ -92,7 +92,7 @@ function init(app) {
 
     app.delete('/api/recipes/:id', function(req, resp) {
         recipeServices.deleteRecipe(req.params.id)
-        .then(respond.withData)
+        .then(respond.withData(resp))
         .catch(respond.withError(resp));
   
     });
@@ -112,7 +112,7 @@ function init(app) {
         }
 
         promise
-        .then(respond.withData)
+        .then(respond.withData(resp))
         .catch(respond.withError(resp));
 
     });
@@ -135,7 +135,7 @@ function init(app) {
         .then(function (recipe) {
             return recipeServices.upsertRecipe(recipe);
         })
-        .then(respond.withData)
+        .then(respond.withData(resp))
         .catch(respond.withError(resp));
    
     });
@@ -219,7 +219,7 @@ function init(app) {
 
     app.get('/api/recipes/values/:fieldPath', function(req, resp) {
         recipeServices.getFieldValues(req.params.fieldPath)
-        .then(respond.withData)
+        .then(respond.withData(resp))
         .catch(respond.withError(resp));
  
     });

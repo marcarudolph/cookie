@@ -21,7 +21,7 @@ function init(app) {
                 ck.getPics(insertedRecipe)
                 return insertedRecipe;
             })
-            .then(respond.withData)
+            .then(respond.withData(resp))
             .catch(respond.withError(resp));            
         });
         
