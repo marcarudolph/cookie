@@ -1,41 +1,46 @@
 'use strict';
 
 angular.module('cookie')
-.directive('markdown', function () {
-    var showdown = new Showdown.converter();
+.factory('markdowner', markdowner)
+.directive('markdown', markdownDirective);
+
+function markdowner() {
+    var service = {
+        makeHtml: makeHtml
+    };
+    var renderer = new marked.Renderer();
+    renderer.paragraph = function paragraphWithoutPTag(text) { 
+        return text;
+    }
+
+    var markedOptions = {
+        gfm: true,
+        sanitize: true,
+        breaks: true,
+        renderer: renderer  
+    };
+
+
+    function makeHtml(md) {
+        return marked(md, markedOptions);
+    }
+
+    return service; 
+}
+
+markdownDirective.$inject = ['markdowner'];
+function markdownDirective(markdowner) {
     return {
         link: function (scope, element, attrs) {
             var markdown = scope[attrs.markdown];
-
-            function safeTags(str) {
-                if (!str)
-                    return str;
-
-                return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') ;
-            }
-
-            function stripWrappingPTag(html) {
-                if (html.indexOf('<p>') === 0)
-                    html = html.substr(3);
-                if (html.substr(html.length - 4) === "</p>")
-                    html = html.substring(0, html.length - 4);
-                    
-                return html;
-            }
-
             function updateContent() {
                 
                 if (!markdown) {
-                    element.html("");
+                    element.html('');
                     return;
                 }
                 
-                var safeMarkdown = safeTags(markdown);
-                
-                var htmlText = showdown.makeHtml(safeMarkdown);
-                
-                htmlText = stripWrappingPTag(htmlText);
-                
+                var htmlText = markdowner.makeHtml(markdown);                
                 element.html(htmlText);            
             }
 
@@ -48,4 +53,4 @@ angular.module('cookie')
         }
     };
 
-});
+}

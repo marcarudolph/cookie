@@ -5,8 +5,8 @@ var savedQuery = "";
 
 
 
-
-function RecipesCtrl($q, $scope, $http, $sce, Page) {
+RecipesCtrl.$inject = ['$q', '$scope', '$http', '$sce', 'Page', 'markdowner'];
+function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
 
     Page.setTitle('Deine Rezepte');
 
@@ -79,24 +79,15 @@ function RecipesCtrl($q, $scope, $http, $sce, Page) {
         });
 
         function transformMarkdown(recipes) {
-            var showdown = new Showdown.converter();
             _.each(recipes, function(recipe) {
                 if (recipe.title) {
-                    recipe.title = stripWrappingPTag(showdown.makeHtml(recipe.title));                        
+                    recipe.title = markdowner.makeHtml(recipe.title);                        
                 }
                 if (recipe.subtitle) {
-                    recipe.subtitle = stripWrappingPTag(showdown.makeHtml(recipe.subtitle));
+                    recipe.subtitle = markdowner.makeHtml(recipe.subtitle);
                 }
             });
-
-            function stripWrappingPTag(html) {
-                if (html.indexOf('<p>') === 0)
-                    html = html.substr(3);
-                if (html.substr(html.length - 4) === "</p>")
-                    html = html.substring(0, html.length - 4);
-                    
-                return html;
-            }                      
+                   
         }
     }
 
