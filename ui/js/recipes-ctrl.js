@@ -12,8 +12,6 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
 
     $scope.recipes = [];
     $scope.query = savedQuery;
-    $scope.itemsToShow = 0;
-    $scope.hasMoreRecipes = true;
     
     $scope.fetcher = null;
 
@@ -23,13 +21,10 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
     $scope.$watch('query', function() {
         var query = savedQuery = $scope.query;
 
-        $scope.itemsToShow = 50;
-        $scope.hasMoreRecipes = true;
-
-        if (pendingRequestAbort) {
-            pendingRequestAbort.resolve();
-            pendingRequestAbort = null;
-        }
+        _.each(pendingRequests, function(pr) {
+            pr.abort.resolve();
+            delete pendingRequests[pr.url];
+        });
 
         $scope.fetcher = function(start, count) { return fetch(query, start, count); };
         //fetchRecipes(true);
@@ -46,27 +41,30 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
         $scope.query = tag;
     }
 
-    $scope.addAPage = function() {
-        if (isPagePending)
-            return;
-
-        $scope.itemsToShow += 50;
-        fetchRecipes();
-    }
-
+    var pendingRequests = {};
     function fetch(query, start, count) {
-        return $q(function(resolve, reject) {
-            var url = '/api/recipes/?q=' + query + "&from=" + start + "&size=" + count;
-            pendingRequestAbort = $q.defer();
+        var url = '/api/recipes/?q=' + query + "&from=" + start + "&size=" + count;            
+
+        if (pendingRequests[url]) {
+           return pendingRequests[url].promise;
+        }      
+
+        var pendingRequest = {
+            url: url,
+            abort: $q.defer(),
+            promise: null
+        }
+
+        pendingRequest.promise = $q(function(resolve, reject) {
 
             $http({
                 method: "get",
                 url: url,
-                timeout: pendingRequestAbort.promise
+                timeout: pendingRequest.abort.promise
             })
             .success(function (recipes) {
                 isPagePending = false;
-                pendingRequestAbort = null;
+                delete pendingRequests[url];
 
                 transformMarkdown(recipes);
 
@@ -77,6 +75,9 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
             });        
 
         });
+
+        pendingRequests[url] = pendingRequest;
+        return pendingRequest.promise;
 
         function transformMarkdown(recipes) {
             _.each(recipes, function(recipe) {
@@ -89,41 +90,5 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
             });
                    
         }
-    }
-
-
-    function fetchRecipes(reset) {
-
-        isPagePending = true;        
-
-        var currentLength = reset ? 0 : $scope.recipes.length,
-            neededSize = $scope.itemsToShow - currentLength,
-            url = '/api/recipes/?q=' + $scope.query + "&from=" + currentLength + "&size=" + neededSize;
-        if (neededSize <= 0)
-            return;
-
-        pendingRequestAbort = $q.defer();
-
-        $http({
-            method: "get",
-            url: url,
-            timeout: pendingRequestAbort.promise
-        })
-        .success(function (data) {
-            isPagePending = false;
-            pendingRequestAbort = null;
-
-            if (reset) {
-                $scope.recipes = [];
-            }
-
-            $scope.recipes = $scope.recipes.concat(data);
-            if (data.length < neededSize) {
-                $scope.hasMoreRecipes = false;
-            }
-        })
-        .error(function(a, b, c) {
-            console.error(a);
-        });        
     }
 }
