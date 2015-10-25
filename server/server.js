@@ -1,6 +1,6 @@
 
 'use strict';
-global.config = require('../config/cookie-config.js');
+global.config = require('config.js');
 
 var express = require('express'),
     bodyParser = require('body-parser'),
