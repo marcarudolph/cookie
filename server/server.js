@@ -25,7 +25,7 @@ security.init(app);
 recipeServices.init(app);
 
 app.use(cacheControl.dontCache);
-app.use(security.ensureAuthenticated);
+app.use(security.ensureAuthenticated(/^\/api\//));
 
 require('./request-handlers/init.js').init(app);
 require('./request-handlers/recipes.js').init(app);

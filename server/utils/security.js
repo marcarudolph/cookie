@@ -76,20 +76,26 @@ module.exports = {
 		});
 	},
 
-	ensureAuthenticated: function(req, res, next) {
-
-		tokenAuth.checkAndGetAuthTokenData(req, res)	
-		.then(function() {
-			var isSkippedRoute = (!req.user);
-			if (isSkippedRoute)
+	ensureAuthenticated: function(activePathRegEx) {
+		return function(req, res, next) {
+			
+			if (!activePathRegEx.test(req.path)) {
 				return next();
+			}
 
-			next();
-		})
-		.catch(function(err) {
-			console.log('auth via token - checkAndGetAuthTokenData failed with error ' + err.stack);
-			return res.sendStatus(401);
-		});
+			tokenAuth.checkAndGetAuthTokenData(req, res)	
+			.then(function() {
+				var isSkippedRoute = (!req.user);
+				if (isSkippedRoute)
+					return next();
+
+				next();
+			})
+			.catch(function(err) {
+				console.log('auth via token - checkAndGetAuthTokenData failed with error ' + err.stack);
+				return res.sendStatus(401);
+			});
+		}
 	}
 }
 

@@ -22,7 +22,7 @@ module.exports = function(options) {
 			encryptKey, 
 			{
 				algorithm: algorithm, 
-				expiresInMinutes: global.config.auth.tokenExpiresInMinutes
+				expiresIn: global.config.auth.tokenExpiresInMinutes * 60
 			}
 		);
 	}
