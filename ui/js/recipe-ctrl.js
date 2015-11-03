@@ -8,14 +8,14 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
     $scope.recipe = {};
     $scope.ingredientValues = {};
     $scope.showPicture = showPicture;
+    $scope.selectedPicture = null;
 
 
     function showPicture(pic) {
+        $scope.selectedPicture = pic;
         ngDialog.open({ 
             template: 'picture-viewer',
-            controller: function PictureViewerCtrl($scope) {
-                $scope.selectedPicture = pic;
-            },
+            scope: $scope
         });
     }
 
