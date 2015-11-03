@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('cookie', ['angularFileUpload', 'ngRoute', 'tagedit']);
+var app = angular.module('cookie', ['angularFileUpload', 'ngRoute', 'tagedit', 'ngDialog']);
 
 app.config(['$httpProvider', function($httpProvider) {
 

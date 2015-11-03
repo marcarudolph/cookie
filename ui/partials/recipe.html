@@ -1,181 +1,172 @@
 <div ng-if="!edit">
-    <div class="h3">
-        <a href="#/"><span class="glyphicon glyphicon-chevron-left"></span></a>
-        &nbsp;
-        <span class="glyphicon glyphicon-pencil clickable" ng-click="beginEdit()"></span>
-    </div>
-    <div class="h1">
-        {{displayCopy.title}}
-    </div>
-    <div class="h4">
-        <div style="float:left">{{displayCopy.subtitle}}</div>
-        <div style="float:right">
-            <span class="glyphicon glyphicon-thumbs-up clickable" title="{{displayCopy.rating.likes}}" ng-click="addLikeToRecipe();"></span>
-            <span class="glyphicon glyphicon-thumbs-down clickable" title="{{displayCopy.rating.likes}}" ng-click="removeLikeFromRecipe();"></span>
-        </div>
-        <div style="clear:both"></div>
+	<div class="h3">
+		<a href="#/"><span class="glyphicon glyphicon-chevron-left"></span></a>
+		&nbsp;
+		<span class="glyphicon glyphicon-pencil clickable" ng-click="beginEdit()"></span>
+	</div>
+	<div class="h1">
+		{{displayCopy.title}}
+	</div>
+	<div class="h4">
+		<div style="float:left">{{displayCopy.subtitle}}</div>
+		<div style="float:right">
+			<span class="glyphicon glyphicon-thumbs-up clickable" title="{{displayCopy.rating.likes}}" ng-click="addLikeToRecipe();"></span>
+			<span class="glyphicon glyphicon-thumbs-down clickable" title="{{displayCopy.rating.likes}}" ng-click="removeLikeFromRecipe();"></span>
+		</div>
+		<div style="clear:both"></div>
 
-    </div>
-    <div class="recipe-tags">
-        <span ng-repeat="tag in displayCopy.tags track by tag" class="tag label label-default">{{tag}}</span>
-    </div>
-    <div class="h4">
-        <br>
-    </div>
+	</div>
+	<div class="recipe-tags">
+		<span ng-repeat="tag in displayCopy.tags track by tag" class="tag label label-default">{{tag}}</span>
+	</div>
+	<div class="h4">
+		<br>
+	</div>
 
-    <div class="row" >
-        <div class="col-xs-12 col-md-7">
-            <div class="panel panel-success">
-                <div class="panel-heading"><span class="h3">Zubereitung</span></div>
-                <ol>
-                    <li ng-repeat="line in displayCopy.instructions track by $index">
-                        <p class="lead" markdown="displayCopy.instructions[$index]"></p>
-                    </li>
-                </ol>            
-            </div>
-        </div>
-        <div class="clearfix visible-xs"></div>
-        <div class="col-xs-12 col-md-offset-1 col-md-4">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <span class="h3">Zutaten f&uuml;r</span>
-                    <input style="width: 40px" type="text" class="" ng-model="displayCopy.servings" required ng-pattern="/\d+(\.\d{1,2})?/"> </input>
-                </div>            
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="ing in displayCopy.ingredients" >
-                        <article ng-click="ing.done = !ing.done" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
-                            <span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
-                            <span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
-                            <span ng-if="ing.unit">{{ing.unit}}</span>
-                            <span markdown="ing.name"></span><span ng-if="ing.comment">{{ing.padded_comment}}</span>
-                            <span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
-                        </article>                    
-                    </li>
-                </ul>           
-            </div>
-        </div>
-    </div>    
+	<div class="row" >
+		<div class="col-xs-12 col-md-7">
+			<div class="panel panel-success">
+				<div class="panel-heading"><span class="h3">Zubereitung</span></div>
+				<ol>
+					<li ng-repeat="line in displayCopy.instructions track by $index">
+						<p class="lead" markdown="displayCopy.instructions[$index]"></p>
+					</li>
+				</ol>            
+			</div>
+		</div>
+		<div class="clearfix visible-xs"></div>
+		<div class="col-xs-12 col-md-offset-1 col-md-4">
+			<div class="panel panel-success">
+				<div class="panel-heading">
+					<span class="h3">Zutaten f&uuml;r</span>
+					<input style="width: 40px" type="text" class="" ng-model="displayCopy.servings" required ng-pattern="/\d+(\.\d{1,2})?/"> </input>
+				</div>            
+				<ul class="list-group">
+					<li class="list-group-item" ng-repeat="ing in displayCopy.ingredients" >
+						<article ng-click="ing.done = !ing.done" ng-class="{true: 'text-muted', false: 'text-primary'}[ing.done]">
+							<span class="glyphicon glyphicon-ok"  ng-hide="!ing.done"></span>
+							<span ng-if="ing.quantity_calc">{{ing.quantity_calc}}</span>
+							<span ng-if="ing.unit">{{ing.unit}}</span>
+							<span markdown="ing.name"></span><span ng-if="ing.comment">{{ing.padded_comment}}</span>
+							<span ng-if="ing.quantity_calc > 0 || ing.unit" class="pull-right glyphicon glyphicon-shopping-cart" ng-click="addToShoppingList(ing); $event.stopPropagation();" title="Auf Kaufliste"></span>
+						</article>                    
+					</li>
+				</ul>           
+			</div>
+		</div>
+	</div>    
 </div>
 
 <div ng-if="edit">
 
-    <datalist id="ingredientValuesNames">
-        <option ng-repeat="value in ingredientValues.names" value="{{value}}" />
-    </datalist>
-    <datalist id="ingredientValuesUnits">
-        <option ng-repeat="value in ingredientValues.units" value="{{value}}" />
-    </datalist>
-    <datalist id="ingredientValuesComments">
-        <option ng-repeat="value in ingredientValues.comments" value="{{value}}" />
-    </datalist>
-    <datalist id="ingredientValuesQuantities">
-        <option ng-repeat="value in ingredientValues.comments" value="" />
-    </datalist>
+	<datalist id="ingredientValuesNames">
+		<option ng-repeat="value in ingredientValues.names" value="{{value}}" />
+	</datalist>
+	<datalist id="ingredientValuesUnits">
+		<option ng-repeat="value in ingredientValues.units" value="{{value}}" />
+	</datalist>
+	<datalist id="ingredientValuesComments">
+		<option ng-repeat="value in ingredientValues.comments" value="{{value}}" />
+	</datalist>
+	<datalist id="ingredientValuesQuantities">
+		<option ng-repeat="value in ingredientValues.comments" value="" />
+	</datalist>
 
-    <div class="h3">
-        <span class="glyphicon glyphicon-ok clickable" ng-click="saveRecipe();" ></span>
-        <span class="glyphicon glyphicon-remove clickable" ng-click="cancelEdit();" ></span>
-    </div>
-    <div class="row" style="margin-top:10px;">
-        <div class="col-xs-12 col-md-10">
-            <div class="h1">
-                <input type="text" ng-model="recipe.title" placeholder="Titel eingeben" style="width: 100%"></input>
-            </div>
-            <div class="h4">
-                <input type="text" ng-model="recipe.subtitle" placeholder="Untertitel eingeben" style="width: 100%"></input>
-            </div>
-        </div>
-    </div>
-    <div class="row" style="margin-top:10px;">
-        <div class="col-xs-12 col-md-10">
-            <div class="panel panel-success">
-                <div class="panel-heading"><span class="h3">Tags</span></div>
-                <div tagedit suggestions="getTags" model="recipe.tags" placeholder="'Tag hinzufügen'"></div>
-            </div>
-        </div>
-    </div> 
+	<div class="h3">
+		<span class="glyphicon glyphicon-ok clickable" ng-click="saveRecipe();" ></span>
+		<span class="glyphicon glyphicon-remove clickable" ng-click="cancelEdit();" ></span>
+	</div>
+	<div class="row" style="margin-top:10px;">
+		<div class="col-xs-12 col-md-10">
+			<div class="h1">
+				<input type="text" ng-model="recipe.title" placeholder="Titel eingeben" style="width: 100%"></input>
+			</div>
+			<div class="h4">
+				<input type="text" ng-model="recipe.subtitle" placeholder="Untertitel eingeben" style="width: 100%"></input>
+			</div>
+		</div>
+	</div>
+	<div class="row" style="margin-top:10px;">
+		<div class="col-xs-12 col-md-10">
+			<div class="panel panel-success">
+				<div class="panel-heading"><span class="h3">Tags</span></div>
+				<div tagedit suggestions="getTags" model="recipe.tags" placeholder="'Tag hinzufügen'"></div>
+			</div>
+		</div>
+	</div> 
 
-   <div class="row" style="margin-top:10px;">
-        <div class="col-xs-12 col-md-10">
-            <div class="panel panel-success">
-                <div class="panel-heading">
-                    <span class="h3">Zutaten</span>
-                    <span class="h5">Berechnungsgrundlage: </span>
-                    <input style="width: 40px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/^([1-9][0-9]*)$/"></input>
-                </div>
-                <ul class="list-group">
-                    <li class="list-group-item" ng-repeat="ing in recipe.ingredients" >
-                        <article >
-                            <input type="text" ng-model="ing.quantity" style="width: 50px" list="ingredientValuesQuantities"></input>
-                            <input type="text" ng-model="ing.unit" style="width: 80px" placeholder="Einh." list="ingredientValuesUnits"></input>
-                            <input type="text" ng-model="ing.name" placeholder="Name" list="ingredientValuesNames"></input>
-                            <input type="text" ng-model="ing.comment" placeholder="Kommentar" ng-keydown="handleIngredientTabKey($event, ing)" list="ingredientValuesComments"></input>   
-                            <div class="glyphicon glyphicon-remove clickable" ng-click="deleteIngredient(ing);"></div>
-                        </article>
-                    </li>
-                </ul>
-                <div class="glyphicon glyphicon-plus clickable" ng-click="addIngredientToRecipe();"></div>
-            </div>
-        </div>
-    </div>
+	 <div class="row" style="margin-top:10px;">
+		<div class="col-xs-12 col-md-10">
+			<div class="panel panel-success">
+				<div class="panel-heading">
+					<span class="h3">Zutaten</span>
+					<span class="h5">Berechnungsgrundlage: </span>
+					<input style="width: 40px" type="text" class="" ng-model="recipe.servings" required ng-pattern="/^([1-9][0-9]*)$/"></input>
+				</div>
+				<ul class="list-group">
+					<li class="list-group-item" ng-repeat="ing in recipe.ingredients" >
+						<article >
+							<input type="text" ng-model="ing.quantity" style="width: 50px" list="ingredientValuesQuantities"></input>
+							<input type="text" ng-model="ing.unit" style="width: 80px" placeholder="Einh." list="ingredientValuesUnits"></input>
+							<input type="text" ng-model="ing.name" placeholder="Name" list="ingredientValuesNames"></input>
+							<input type="text" ng-model="ing.comment" placeholder="Kommentar" ng-keydown="handleIngredientTabKey($event, ing)" list="ingredientValuesComments"></input>   
+							<div class="glyphicon glyphicon-remove clickable" ng-click="deleteIngredient(ing);"></div>
+						</article>
+					</li>
+				</ul>
+				<div class="glyphicon glyphicon-plus clickable" ng-click="addIngredientToRecipe();"></div>
+			</div>
+		</div>
+	</div>
 
-    <div class="row" style="margin-top:10px;">
-        <div class="col-xs-12 col-md-10">
-            <div class="panel panel-success">
-                <div class="panel-heading"><span class="h3">Zubereitung</span></div>
-                <ol>
-                    <li ng-repeat="line in recipe.instructions track by $index">
-                        <div>
-                            <textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
-                            <div class="glyphicon glyphicon-remove clickable" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
-                        </div>
-                    </li>
-                </ol>
-                <div class="glyphicon glyphicon-plus clickable" ng-click="addInstructionToRecipe();"  ></div>
-            </div>
-        </div>
-    </div>
+	<div class="row" style="margin-top:10px;">
+		<div class="col-xs-12 col-md-10">
+			<div class="panel panel-success">
+				<div class="panel-heading"><span class="h3">Zubereitung</span></div>
+				<ol>
+					<li ng-repeat="line in recipe.instructions track by $index">
+						<div>
+							<textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
+							<div class="glyphicon glyphicon-remove clickable" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
+						</div>
+					</li>
+				</ol>
+				<div class="glyphicon glyphicon-plus clickable" ng-click="addInstructionToRecipe();"  ></div>
+			</div>
+		</div>
+	</div>
 </div>
 
 
 
 <div class="row" >
-    <div class="col-xs-12 col-md-12">
-        <div class="panel panel-success">
-            <div class="panel-heading">
-                <span class="h3">Bilder</span>
-                <div class="pull-right">
-                    <div class="btn btn-default btn-file" ng-if="!edit">
-                        <span class="glyphicon glyphicon-plus"></span>
-                        <input type="file" ng-file-select="onFileSelect($files)" multiple></input>
-                    </div>
-                </div>
-            </div>  
-            <div>
-                <div style="float: clear;">  
-                    <div class="thumbnail" style="float:left; margin-right:10px; margin-bottom:10px;"  ng-repeat="pic in displayCopy.pictures">
-                        <img ng-src="/pics/thumbnails/{{pic.file}}" style="max-width:150px;"></img>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="col-xs-12 col-md-12">
+		<div class="panel panel-success">
+			<div class="panel-heading">
+				<span class="h3">Bilder</span>
+				<div class="pull-right">
+					<div class="btn btn-default btn-file" ng-if="!edit">
+						<span class="glyphicon glyphicon-plus"></span>
+						<input type="file" ng-file-select="onFileSelect($files)" multiple></input>
+					</div>
+				</div>
+			</div>  
+			<div>
+				<div style="float: clear;">  
+					<div class="thumbnail" style="float:left; margin-right:10px; margin-bottom:10px;" ng-repeat="pic in displayCopy.pictures">
+						<img ng-src="/pics/thumbnails/{{pic.file}}" style="max-width:150px;" ng-click="showPicture(pic);"></img>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
-<div class="modal fade in" id="myModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close"><span>&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
+
+<script type="text/ng-template" id="picture-viewer">
+<div style="text-align:center;">
+ 	<img ng-src="/pics/{{selectedPicture.file}}" style="margin-top:15px; max-width:100%;" ng-click="closeThisDialog(selectedPicture);"></img>
+ 	<div>
+ 	</div>
 </div>
+</script>

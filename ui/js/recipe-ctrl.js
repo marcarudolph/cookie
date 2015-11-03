@@ -1,13 +1,24 @@
 'use strict';
 
 
-RecipeCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q'];
-function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q) {
+RecipeCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q', 'ngDialog'];
+function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
 
     var id = $routeParams.recipeId;
     $scope.recipe = {};
-
     $scope.ingredientValues = {};
+    $scope.showPicture = showPicture;
+
+
+    function showPicture(pic) {
+        ngDialog.open({ 
+            template: 'picture-viewer',
+            controller: function PictureViewerCtrl($scope) {
+                $scope.selectedPicture = pic;
+            },
+        });
+    }
+
 
     function createNewRecipe() {
         var recipe = {

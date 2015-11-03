@@ -239,3 +239,8 @@ a, .clickable {
     -o-transform: translateZ(0);
     transform: translateZ(0);
 }
+
+.ngdialog.ngdialog-theme-default .ngdialog-content {
+    max-width: 80%;
+    width: initial;
+}
