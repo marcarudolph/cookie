@@ -10,7 +10,6 @@
     "elasticsearch": "*",
     "es6-promise": "*",
     "express": "*",
-    "sharp": "*",
     "jsonwebtoken": "^5.0.1",
     "multer": "*",
     "passport": "0.2.*",
@@ -18,5 +17,8 @@
     "passport-oauth": "^1.0.0",
     "request": "*",
     "shortid": "*"
+  },
+  "optionalDependencies": {
+    "sharp": "*"    
   }
 }

@@ -1,9 +1,7 @@
 "use strict";
 
-var Promise = require('es6-promise').Promise,
-    sharp = require('sharp');
+var Promise = require('es6-promise').Promise;
 
-sharp.concurrency(1);
 
 exports.generatePicAndThumb = function generatePicAndThumb(rawPicture) {
 
@@ -19,11 +17,11 @@ exports.generatePicAndThumb = function generatePicAndThumb(rawPicture) {
         })
         .catch(reject);
     });
-}
+};
 
 function resize(sourcePath, targetPath, maxSize, quality) {
    return new Promise(function(resolve, reject) {
-        sharp(sourcePath)        
+        getSharp(sourcePath)        
         .resize(maxSize).max().withoutEnlargement()
         .rotate()
         .quality(quality)
@@ -34,4 +32,13 @@ function resize(sourcePath, targetPath, maxSize, quality) {
             return resolve();
         });
     });     
+}
+
+var sharp;
+function getSharp() {
+    if (!sharp) {
+        sharp = require('sharp');
+        sharp.concurrency(1);
+    }
+    return sharp;
 }
