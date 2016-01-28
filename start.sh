@@ -1,1 +1,0 @@
-pm2 start ./server/server.js -i 1 --name cookie-server

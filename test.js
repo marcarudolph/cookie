@@ -1,1 +1,0 @@
-console.log("Hello World. I'm cookie and i'm from the dark side.");
