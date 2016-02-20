@@ -31,11 +31,34 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
     });
 
     $scope.getFromCK = function() {
-        $http.get('/api/fetchCK/' + $scope.ckId)
-        .success(function (newRecipe) {
-            window.location.href = "/#/recipes/" + newRecipe._id;
-        });
+      var ckId = extractId($scope.ckId);
+      if(!ckId){
+        alert("insert valid id or url");
+        return;
+      }
+      
+      $http.get('/api/fetchCK/' + ckId)
+      .success(function (newRecipe) {
+          window.location.href = "/#/recipes/" + newRecipe._id;
+      });
     };
+    
+    function extractId(input){
+      var urlIdRegEx = /^http.*?\/?m?([0-9]+)\/?/g;
+      var idOnlyRegEx = /^m?([0-9]+)$/g;
+      
+      var matches = urlIdRegEx.exec(input.trim(' '));
+      
+      if(!matches || !matches[1]) {
+        matches = idOnlyRegEx.exec(input.trim(' '));
+      }
+      
+      if(!matches || !matches[1]){
+        return undefined;
+      }
+      
+      return matches[1];
+    }
 
     $scope.filterByTag = function(tag) {
         $scope.query = tag;
@@ -43,11 +66,11 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
 
     var pendingRequests = {};
     function fetch(query, start, count) {
-        var url = '/api/recipes/?q=' + query + "&from=" + start + "&size=" + count;            
+        var url = '/api/recipes/?q=' + query + "&from=" + start + "&size=" + count;
 
         if (pendingRequests[url]) {
            return pendingRequests[url].promise;
-        }      
+        }
 
         var pendingRequest = {
             url: url,
@@ -72,7 +95,7 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
             })
             .error(function(a, b, c) {
                 reject(a);
-            });        
+            });
 
         });
 
@@ -82,7 +105,7 @@ function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
         function transformMarkdown(recipes) {
             _.each(recipes, function(recipe) {
                 if (recipe.title) {
-                    recipe.title = markdowner.makeHtml(recipe.title);                        
+                    recipe.title = markdowner.makeHtml(recipe.title);
                 }
                 if (recipe.subtitle) {
                     recipe.subtitle = markdowner.makeHtml(recipe.subtitle);

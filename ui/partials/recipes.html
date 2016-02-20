@@ -8,11 +8,11 @@
     </div>
     <div ng-show="isCKOpen" class="overlay panel">
         <form ng-submit="getFromCK()">
-            <input type="text" ng-model="ckId"  size="30"
-                   placeholder="CK ID">
+            <input type="text" ng-model="ckId"  style="width:80%"
+                   placeholder="CK URL or ID">
             <input class="btn btn-primary" type="submit" value="Get it!">
         </form>
-    </div>    
+    </div>
     <div>
         <input class="search-box" ng-model="query" ng-model-options="{ debounce: 200 }" placeholder="Suche..." style="width:80%">
         <span class="clickable" ng-click="query = ''">X</span>
@@ -21,11 +21,11 @@
     <div infinite-scroll="recipe in fetcher" class="recipe-list" >
         <li>
             <a href="#/recipes/[[:recipe._id]]">
-                [[ if (recipe.titlePicture) { ]]          
-                    <div class="recipe-title-image" style="background-image:url(pics/thumbnails/[[:recipe.titlePicture]])">&nbsp;</div>                    
-                [[ } else { ]]         
+                [[ if (recipe.titlePicture) { ]]
+                    <div class="recipe-title-image" style="background-image:url(pics/thumbnails/[[:recipe.titlePicture]])">&nbsp;</div>
+                [[ } else { ]]
                     <div class="recipe-title-image">&nbsp;</div>
-                [[ } ]]           
+                [[ } ]]
             </a>
             <div class="recipe-description">
                 <a href="#/recipes/[[:recipe._id]]">
@@ -37,9 +37,9 @@
             <div class="recipe-tags">
                 [[ _.each(recipe.tags, function(tag) { ]]
                    <span class="tag label label-default" ng-click="filterByTag('[[:tag]]');">[[:tag]]</span>
-                [[ }); ]] 
+                [[ }); ]]
             </div>
-        </li>        
+        </li>
     </div>
 
 </div>
