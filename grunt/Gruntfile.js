@@ -5,6 +5,8 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.loadNpmTasks('grunt-contrib-connect');
+	grunt.loadNpmTasks('grunt-connect-proxy');	
 	grunt.loadNpmTasks('grunt-usemin');
 	grunt.loadNpmTasks('grunt-filerev');
 	grunt.loadNpmTasks('grunt-htmlclean');
@@ -74,13 +76,32 @@ module.exports = function(grunt) {
 			options: {
 				assetsDirs: ['./build/ui/']
 			}
-		}		
+		},
+		connect: {
+			app: {
+				options: {
+					port: 8089,
+					protocol: 'http',
+					base: './build/ui/',
+					hostname: '*',
+					middleware: [require('grunt-connect-proxy/lib/utils').proxyRequest]
+				},
+				proxies: [{
+					context: '/',
+					host: 'localhost',
+					port: 8088,
+					https: false,
+					changeOrigin: false,
+					xforward: true
+				}]
+			}
+		}				
 	});
 
 
 	grunt.registerTask('update-output:dev', [ 'sync:ui-dev' ]);
 
-	grunt.registerTask('live', [ 'clean', 'update-output:dev' ]);
+	grunt.registerTask('live', [ 'clean', 'update-output:dev', 'configureProxies:app', 'connect:app', 'esteWatch' ]);
 
 	grunt.registerTask('usemin-build', ['useminPrepare', 'concat:generated', 'uglify:generated', 'cssmin:generated', 'filerev', 'usemin']);
 	grunt.registerTask('release', [ 'clean', 'sync:ui-release', 'usemin-build' ]);
