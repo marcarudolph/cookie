@@ -27,5 +27,9 @@ module.exports = function(grunt) {
             }
         }
     });
-    grunt.registerTask('backup', ['sync:backup', 'exec:backup-build', 'exec:backup-tag', 'exec:backup-push']);
+    grunt.registerTask('backup', [
+        'sync:backup',
+        'exec:backup-build',
+        'exec:backup-tag'//, 'exec:backup-push'
+    ]);
 }

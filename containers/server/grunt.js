@@ -80,6 +80,6 @@ module.exports = function(grunt) {
     grunt.registerTask('server', [
         'run_grunt:ui-build',
         'sync:server-server', 'sync:server-ui', 'sync:server-config', 'sync:server-docker',
-        'shell:server-build', 'shell:server-tag', 'shell:server-push'
+        'shell:server-build', 'shell:server-tag'//, 'shell:server-push'
     ]);
 }
