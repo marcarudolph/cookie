@@ -1,8 +1,8 @@
 'use strict';
 
 
-RecipeCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q', 'ngDialog'];
-function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
+RecipeCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q', 'ngDialog', 'ShoppingCart'];
+function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog, ShoppingCart) {
 
     var id = $routeParams.recipeId;
     $scope.recipe = {};
@@ -98,13 +98,12 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
         }
     }
 
-
     $scope.addToShoppingList = function (ingredient) {
-      globalShoppingChart.items.push({
-      'forRecipe': $scope.recipe.title,
-      'quantity': ingredient.quantity_calc + " " + ingredient.unit,
-      'ingredient': ingredient.name + " " + ingredient.comment
-      });
+      ShoppingCart.addItem(
+          ingredient.name + " " + ingredient.comment,
+          ingredient.quantity_calc + " " + ingredient.unit,
+          $scope.recipe.title
+        );
     };
 
     $scope.addInstructionToRecipe = function (){

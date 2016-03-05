@@ -1,11 +1,6 @@
 'use strict';
 
 var savedQuery = "";
-var globalShoppingChart = {
-  items: []
-};
-
-
 
 
 RecipesCtrl.$inject = ['$q', '$scope', '$http', '$sce', 'Page', 'markdowner'];
