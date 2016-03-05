@@ -25,7 +25,7 @@
     }
     
     function clearItems(){
-      items = [];
+      items.length = 0;
     }
     
     function getItems(){
@@ -37,6 +37,7 @@
   ShoppingCartCtrl.$inject = ['$scope', 'ShoppingCart'];
   function ShoppingCartCtrl($scope, ShoppingCart){
     $scope.items = ShoppingCart.getItems();
+    $scope.clearItems = ShoppingCart.clearItems;
     
   }
 })();
