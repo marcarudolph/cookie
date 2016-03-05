@@ -1,6 +1,9 @@
 'use strict';
 
 var savedQuery = "";
+var globalShoppingChart = {
+  items: []
+};
 
 
 
