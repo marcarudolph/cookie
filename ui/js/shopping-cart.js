@@ -1,7 +1,8 @@
 (function (){
   'use strict';
   angular.module('cookie')
-    .factory('ShoppingCart', ShoppingCart);
+    .factory('ShoppingCart', ShoppingCart)
+    .controller('ShoppingCartCtrl', ShoppingCartCtrl);
   
   ShoppingCart.$inject = [];
   function ShoppingCart() {
@@ -9,16 +10,33 @@
     var items = [];
     
     return {
-      addItem: addItem
+      addItem: addItem,
+      clearItems: clearItems,
+      getItems: getItems
     };
     
     function addItem(ingredient, quantity, forRecipe){
       items.push({
         ingredient: ingredient,
         quantity: quantity,
-        forRecipe : forRecipe || 'foobar'
+        forRecipe : forRecipe,
+        done: false
       });
     }
     
-  };
+    function clearItems(){
+      items = [];
+    }
+    
+    function getItems(){
+      return items;
+    }
+    
+  }
+  
+  ShoppingCartCtrl.$inject = ['$scope', 'ShoppingCart'];
+  function ShoppingCartCtrl($scope, ShoppingCart){
+    $scope.items = ShoppingCart.getItems();
+    
+  }
 })();

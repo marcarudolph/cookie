@@ -19,6 +19,10 @@ angular.module('cookie')
         templateUrl: 'partials/recipe.html',
         controller: RecipeCtrl
     }).
+    when('/shopping-cart', {
+        templateUrl: 'partials/shopping-cart.html',
+        controller: 'ShoppingCartCtrl'
+    }).
     otherwise({
         redirectTo: '/'
     });
