@@ -3,8 +3,6 @@
 var savedQuery = "";
 
 
-
-
 RecipesCtrl.$inject = ['$q', '$scope', '$http', '$sce', 'Page', 'markdowner'];
 function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
 

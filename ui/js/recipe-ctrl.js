@@ -1,8 +1,8 @@
 'use strict';
 
 
-RecipeCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q', 'ngDialog'];
-function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
+RecipeCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q', 'ngDialog', 'ShoppingCart'];
+function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog, ShoppingCart) {
 
     var id = $routeParams.recipeId;
     $scope.recipe = {};
@@ -13,7 +13,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
 
     function showPicture(pic) {
         $scope.selectedPicture = pic;
-        ngDialog.open({ 
+        ngDialog.open({
             template: 'picture-viewer',
             scope: $scope
         });
@@ -60,7 +60,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
         })
         .error(function() {
             Page.setTitle('Ooops...');
-        });        
+        });
     }
 
     function updateCalculatedProperties() {
@@ -98,9 +98,12 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
         }
     }
 
-
     $scope.addToShoppingList = function (ingredient) {
-        console.log(ingredient.name);
+      ShoppingCart.addItem(
+          ingredient.name + " " + ingredient.comment,
+          ingredient.quantity_calc + " " + ingredient.unit,
+          $scope.recipe.title
+        );
     };
 
     $scope.addInstructionToRecipe = function (){
@@ -111,7 +114,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
         var index = $scope.recipe.instructions.indexOf(instruction);
         if (index > -1) {
             $scope.recipe.instructions.splice(index, 1);
-        }        
+        }
     };
 
     $scope.handleInstructionTabKey = function(event, element) {
@@ -152,7 +155,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
         $http.post('/api/recipes/' + $scope.recipe._id + '/likes', {'action': action })
         .success(function() {
             loadRecipe($scope.recipe._id);
-        });        
+        });
     }
 
     $scope.$watch('displayCopy.servings', function (newValue) {
@@ -160,7 +163,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
             return;
 
         $scope.displayCopy.servings = newValue;
-        $scope.recalculateServings();        
+        $scope.recalculateServings();
     });
 
     $scope.recalculateServings = function () {
@@ -182,7 +185,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
     
     $scope.cancelEdit = function () {
         $scope.recipe = $scope.recipeBackup;
-        $scope.edit = false;    
+        $scope.edit = false;
     };
     
     $scope.saveRecipe = function () {
@@ -205,7 +208,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
         $http.post('/api/recipes/?action=new', $scope.recipe)
         .success(function(response) {
             window.location.href = '/#/recipes/' +  response._id;
-        });      
+        });
     };
 
     $scope.tagFetcher = null;
@@ -214,12 +217,12 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
         return $q(function(resolve, reject) {
             $scope.tagFetcher
             .success(function(tags) {
-                var matchingTags = tags.filter(function(t) { 
+                var matchingTags = tags.filter(function(t) {
                     return t.tag.toLowerCase().indexOf(query) === 0;}
                 );
                 var tagsForControl = matchingTags.map(function(t) {
                     var tag = t.tag;
-                    return tag.charAt(0).toUpperCase() + tag.slice(1); 
+                    return tag.charAt(0).toUpperCase() + tag.slice(1);
                 });
                 return resolve(tagsForControl);
             })
@@ -246,12 +249,12 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
     function renameAndSaveRecipeToServer(recipe){
         $http.post('/api/recipes/?action=rename',
             {
-                oldId: recipe._id, 
+                oldId: recipe._id,
                 title: recipe.title
             }
         )
         .success(function(response) {
-            recipe._id = response._id; 
+            recipe._id = response._id;
             saveRecipeToServer(recipe);
             window.location.href = '/#/recipes/' +  recipe._id;
         });
@@ -260,9 +263,9 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog) {
     function saveRecipeToServer(recipe){
         $http.put('/api/recipes/' + recipe._id, recipe)
         .success(function() {
-            refreshDisplayCopy();    
+            refreshDisplayCopy();
         });
-    }  
+    }
 
     $scope.onFileSelect = function($files) {
         $scope.upload = $upload.upload({
