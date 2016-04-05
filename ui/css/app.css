@@ -244,3 +244,24 @@ a, .clickable {
     max-width: 80%;
     width: initial;
 }
+
+.speech-recognition-wrapper {
+    position: relative;
+}
+
+.speech-recognition-toggle {
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid lightgrey;       
+    border-radius: 50%;
+    text-align: center;
+
+
+}
+.speech-recognition-toggle.active {
+    background: #dff0d8;
+}

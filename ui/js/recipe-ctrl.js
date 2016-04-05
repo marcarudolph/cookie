@@ -9,6 +9,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog, Sh
     $scope.ingredientValues = {};
     $scope.showPicture = showPicture;
     $scope.selectedPicture = null;
+    $scope.recognitionActive = [];
 
 
     function showPicture(pic) {
@@ -107,6 +108,12 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog, Sh
     };
 
     $scope.addInstructionToRecipe = function (){
+        var wasRecognitionActive = $scope.recognitionActive[$scope.recipe.instructions.length-1];
+        if (wasRecognitionActive) {
+            $scope.recognitionActive[$scope.recipe.instructions.length-1] = false;
+            $scope.recognitionActive[$scope.recipe.instructions.length] = true;
+        }
+        
         $scope.recipe.instructions.push('');
     };
     
@@ -122,7 +129,7 @@ function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog, Sh
     };
 
     $scope.addIngredientToRecipe = function (){
-       $scope.recipe.ingredients.push(
+        $scope.recipe.ingredients.push(
             {
               'name': '',
               'comment': '',
