@@ -10,8 +10,8 @@ CMD ["node", "/cookie/server/server.js"]
 # Build Libvips / Sharp
 RUN apk add --update curl bash build-base python glib-dev libxml2-dev pkgconfig tiff-dev libjpeg-turbo-dev libpng-dev libgsf-dev && \
 	cd /tmp/ && \
-	wget http://www.vips.ecs.soton.ac.uk/supported/current/vips-8.1.1.tar.gz && \
-	tar -xzvf vips-8.1.1.tar.gz && \
+	wget http://www.vips.ecs.soton.ac.uk/supported/current/vips-8.3.3.tar.gz && \
+	tar -xzvf vips-8.3.3.tar.gz && \
 	cd vips* && \
 	./configure && \
 	make && \
