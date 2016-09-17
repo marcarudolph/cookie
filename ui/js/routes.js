@@ -8,7 +8,6 @@ angular.module('cookie')
         controller: RecipesCtrl
     }).
     when('/auth', {
-        templateUrl: 'partials/auth.html',
         controller: AuthCtrl
     }).
     when('/error', {

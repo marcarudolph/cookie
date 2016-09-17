@@ -57,7 +57,7 @@ module.exports = {
 		app.use(passport.initialize());
 
 		app.get('/auth/google', 
-		  passport.authenticate('google', { failureRedirect: '/#/signin', failureFlash: false, scope: ['https://www.googleapis.com/auth/userinfo.email'] }),
+		  passport.authenticate('google', { failureRedirect: '/#/signin', failureFlash: false, scope: ['email'] }),
 		  function(req, res) {
 		    res.redirect('/');
 		  });
