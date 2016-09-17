@@ -126,7 +126,7 @@
 				<ol>
 					<li ng-repeat="line in recipe.instructions track by $index">
 						<div>
-							<textarea style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
+							<textarea speech-recognition recognition-active="recognitionActive[$index]" style="width:100%;" ng-model="recipe.instructions[$index]" ng-keydown="handleInstructionTabKey($event, line)" placeholder="Zubereitungsschritt beschreiben"></textarea>
 							<div class="glyphicon glyphicon-remove clickable" ng-click="deleteInstruction(recipe.instructions[$index]);"></div>
 						</div>
 					</li>
