@@ -3,8 +3,8 @@
 var savedQuery = "";
 
 
-RecipesCtrl.$inject = ['$q', '$scope', '$http', '$sce', 'Page', 'markdowner'];
-function RecipesCtrl($q, $scope, $http, $sce, Page, markdowner) {
+RecipeListCtrl.$inject = ['$q', '$scope', '$http', '$sce', 'Page', 'markdowner'];
+function RecipeListCtrl($q, $scope, $http, $sce, Page, markdowner) {
 
     Page.setTitle('Deine Rezepte');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cookie')
+angular.module('cookie-utils')
 .factory('markdowner', markdowner)
 .directive('markdown', markdownDirective);
 

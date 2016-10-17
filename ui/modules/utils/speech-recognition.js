@@ -2,7 +2,7 @@
 
     'use strict';
 
-    angular.module('cookie')
+    angular.module('cookie-utils')
         .directive('speechRecognition', speechRecognition);
 
     function speechRecognition() {

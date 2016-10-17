@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('cookie')
+angular.module('cookie-utils')
     .controller('PageCtrl', PageCtrl)
     .factory('Page', Page);
 

@@ -3,7 +3,7 @@ var dbCreds = process.env.ES_CREDS ? process.env.ES_CREDS + "@" : "",
     dbHost = process.env.ES_HOST || "elastic01:9243",
     uploadTempPath = process.env.UPLOAD_TEMP_PATH || "/tmp",
     picturesPath = process.env.PICTURES_PATH || "./pics",
-    baseurl = process.env.BASE_URL || "http://localhost:8088",
+    baseurl = process.env.BASE_URL || "http://localhost:8089",
     connString = dbCreds + dbHost;
 
 

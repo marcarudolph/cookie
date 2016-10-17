@@ -1,8 +1,8 @@
 'use strict';
 
 
-RecipeCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q', 'ngDialog', 'ShoppingCart'];
-function RecipeCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog, ShoppingCart) {
+RecipeDetailsCtrl.$inject = ['$scope', '$routeParams', 'Page', '$upload', '$http', '$q', 'ngDialog', 'ShoppingCart'];
+function RecipeDetailsCtrl($scope, $routeParams, Page, $upload, $http, $q, ngDialog, ShoppingCart) {
 
     var id = $routeParams.recipeId;
     $scope.recipe = {};
