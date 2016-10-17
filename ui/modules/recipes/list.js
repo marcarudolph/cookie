@@ -87,7 +87,7 @@ function RecipeListCtrl($q, $scope, $http, $sce, Page, markdowner) {
                 isPagePending = false;
                 delete pendingRequests[url];
 
-                transformMarkdown(recipes);
+                transformHighlights(recipes);
 
                 resolve(recipes);
             })
@@ -100,14 +100,10 @@ function RecipeListCtrl($q, $scope, $http, $sce, Page, markdowner) {
         pendingRequests[url] = pendingRequest;
         return pendingRequest.promise;
 
-        function transformMarkdown(recipes) {
+        function transformHighlights(recipes) {
             _.each(recipes, function(recipe) {
-                if (recipe.title) {
-                    recipe.title = markdowner.makeHtml(recipe.title);
-                }
-                if (recipe.subtitle) {
-                    recipe.subtitle = markdowner.makeHtml(recipe.subtitle);
-                }
+                recipe.title = recipe.title_highlight_html || recipe.title;
+                recipe.subtitle = recipe.subtitle_highlight_html || recipe.subtitle;
             });
                    
         }

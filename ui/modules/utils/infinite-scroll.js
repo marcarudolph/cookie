@@ -89,7 +89,7 @@
                 dataset: requestData,
                 dataFiller: renderTemplate,
                 preventDefault: false,
-                cacheSize: 250
+                cacheSize: 100
             });
         }
 

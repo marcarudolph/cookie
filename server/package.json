@@ -11,6 +11,7 @@
     "es6-promise": "*",
     "express": "*",
     "jsonwebtoken": "^5.0.1",
+    "marked": "^0.3.6",
     "multer": "*",
     "passport": "0.2.*",
     "passport-google-oauth": "^0.1.5",
@@ -19,6 +20,6 @@
     "shortid": "*"
   },
   "optionalDependencies": {
-    "sharp": "*"    
+    "sharp": "*"
   }
 }

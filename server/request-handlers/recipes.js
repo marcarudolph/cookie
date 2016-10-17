@@ -3,9 +3,23 @@
 var fs = require('fs');    
 var multer = require('multer');
 var shortid = require('shortid');
+var marked = require('marked');
 var respond = require('../utils/respond.js');
 var recipeServices = require('../utils/recipe-services.js');
 var imaging = require('../utils/imaging.js');
+
+
+var markedRenderer = new marked.Renderer();
+markedRenderer.paragraph = function paragraphWithoutPTag(text) { 
+    return text;
+};
+
+marked.setOptions({
+    gfm: true,
+    sanitize: true,
+    breaks: true,
+    renderer: markedRenderer  
+});
 
 
 exports.init = init;
@@ -54,11 +68,13 @@ function init(app) {
                 hit._source._id = hit._id;
 
                 if (hit.highlight) {
-                    if (hit.highlight.title)
-                        hit._source.title = hit.highlight.title[0];
+                    if (hit.highlight.title) {                        
+                        hit._source.title_highlight_html = marked(hit.highlight.title[0]);
+                    }
 
-                    if (hit.highlight.subtitle)
-                        hit._source.subtitle = hit.highlight.subtitle[0];
+                    if (hit.highlight.subtitle) {
+                        hit._source.subtitle_highlight_html = marked(hit.highlight.subtitle[0]);
+                    }
                 }
 
                 return hit._source;
